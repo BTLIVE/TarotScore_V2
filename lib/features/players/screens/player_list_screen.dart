@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/player.dart';
 import '../services/player_service.dart';
+import '../widgets/player_list_tile.dart';
 import 'player_form_screen.dart';
 
 class PlayerListScreen extends StatefulWidget {
@@ -35,21 +36,21 @@ class _PlayerListScreenState extends State<PlayerListScreen> {
     });
   }
 
-  Future<void> _createPlayer() async {
-    final result = await Navigator.push<bool>(
+  Future<void> _addPlayer() async {
+    final created = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => const PlayerFormScreen(),
       ),
     );
 
-    if (result == true) {
+    if (created == true) {
       await _loadPlayers();
     }
   }
 
   Future<void> _editPlayer(Player player) async {
-    final result = await Navigator.push<bool>(
+    final updated = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => PlayerFormScreen(
@@ -58,7 +59,7 @@ class _PlayerListScreenState extends State<PlayerListScreen> {
       ),
     );
 
-    if (result == true) {
+    if (updated == true) {
       await _loadPlayers();
     }
   }
@@ -68,11 +69,13 @@ class _PlayerListScreenState extends State<PlayerListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Joueurs'),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _createPlayer,
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Ajouter un joueur',
+            onPressed: _addPlayer,
+          ),
+        ],
       ),
       body: _loading
           ? const Center(
@@ -81,31 +84,18 @@ class _PlayerListScreenState extends State<PlayerListScreen> {
           : _players.isEmpty
               ? const Center(
                   child: Text(
-                    'Aucun joueur',
+                    'Aucun joueur enregistré.',
                   ),
                 )
               : ListView.separated(
                   itemCount: _players.length,
-separatorBuilder: (context, index) => const Divider(height: 1),
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final player = _players[index];
 
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: Text(
-                          player.firstName.isNotEmpty
-                              ? player.firstName[0].toUpperCase()
-                              : '?',
-                        ),
-                      ),
-                      title: Text(player.displayName),
-                      subtitle: Text(player.fullName),
-                      trailing: player.active
-                          ? null
-                          : const Icon(
-                              Icons.block,
-                              color: Colors.red,
-                            ),
+                    return PlayerListTile(
+                      player: player,
                       onTap: () => _editPlayer(player),
                     );
                   },

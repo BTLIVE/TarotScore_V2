@@ -48,17 +48,54 @@ class Player {
     required this.updatedAt,
   });
 
+  //--------------------------------------------------------------------------
+  // Getters
+  //--------------------------------------------------------------------------
+
   /// Nom complet.
-  String get fullName => '$firstName $lastName';
+  String get fullName => '$lastName $firstName';
 
   /// Nom affiché dans l'application.
-  String get displayName {
-    if (nickname != null && nickname!.trim().isNotEmpty) {
-      return nickname!;
+  String get displayName => hasNickname ? nickname! : fullName;
+
+  /// Le joueur possède un surnom.
+  bool get hasNickname =>
+      nickname != null && nickname!.trim().isNotEmpty;
+
+  /// Le joueur possède une photo.
+  bool get hasPhoto =>
+      photoFileName != null && photoFileName!.isNotEmpty;
+
+  /// Initiales du joueur.
+  String get initials {
+    final first = firstName.isNotEmpty ? firstName[0] : '';
+    final last = lastName.isNotEmpty ? lastName[0] : '';
+
+    return (first + last).toUpperCase();
+  }
+
+  /// Âge du joueur.
+  int? get age {
+    if (birthDate == null) {
+      return null;
     }
 
-    return fullName;
+    final today = DateTime.now();
+
+    var age = today.year - birthDate!.year;
+
+    if (today.month < birthDate!.month ||
+        (today.month == birthDate!.month &&
+            today.day < birthDate!.day)) {
+      age--;
+    }
+
+    return age;
   }
+
+  //--------------------------------------------------------------------------
+  // Copy
+  //--------------------------------------------------------------------------
 
   Player copyWith({
     int? id,
@@ -93,6 +130,10 @@ class Player {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  //--------------------------------------------------------------------------
+  // Mapping
+  //--------------------------------------------------------------------------
 
   factory Player.fromMap(Map<String, dynamic> map) {
     return Player(
@@ -132,5 +173,10 @@ class Player {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+  }
+
+  @override
+  String toString() {
+    return 'Player(id: $id, uuid: $uuid, fullName: $fullName)';
   }
 }
