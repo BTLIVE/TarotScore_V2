@@ -1,33 +1,61 @@
+// ***************************************************************************
+// TarotScore V2
+//
+// Fichier : player.dart
+//
+// Description : Modèle représentant un joueur.
+//
+// Auteur : David
+// ***************************************************************************
+
 class Player {
   final int? id;
 
   /// Identifiant unique permanent.
   final String uuid;
 
-  /// Informations générales
+  //--------------------------------------------------------------------------
+  // Informations générales
+  //--------------------------------------------------------------------------
+
   String firstName;
   String lastName;
   String? nickname;
 
-  /// Contact
+  //--------------------------------------------------------------------------
+  // Contact
+  //--------------------------------------------------------------------------
+
   String? email;
   String? mobilePhone;
 
-  /// Informations personnelles
+  //--------------------------------------------------------------------------
+  // Informations personnelles
+  //--------------------------------------------------------------------------
+
   DateTime? birthDate;
   String? comments;
 
-  /// Identité visuelle
+  //--------------------------------------------------------------------------
+  // Identité visuelle
+  //--------------------------------------------------------------------------
+
   String avatarId;
 
   /// Nom du fichier de la photo.
   /// Le chemin complet est reconstruit par PhotoStorageService.
   String? photoFileName;
 
-  /// État du joueur
+  //--------------------------------------------------------------------------
+  // Etat
+  //--------------------------------------------------------------------------
+
   bool active;
 
-  /// Audit
+  //--------------------------------------------------------------------------
+  // Audit
+  //--------------------------------------------------------------------------
+
   final DateTime createdAt;
   DateTime updatedAt;
 
@@ -42,7 +70,6 @@ class Player {
     this.birthDate,
     this.comments,
     this.avatarId = 'male_01',
-    
     this.photoFileName,
     this.active = true,
     required this.createdAt,
@@ -65,7 +92,8 @@ class Player {
 
   /// Le joueur possède une photo.
   bool get hasPhoto =>
-      photoFileName != null && photoFileName!.isNotEmpty;
+      photoFileName != null &&
+      photoFileName!.trim().isNotEmpty;
 
   /// Initiales du joueur.
   String get initials {
@@ -149,7 +177,7 @@ class Player {
           ? DateTime.parse(map['birth_date'] as String)
           : null,
       comments: map['comments'] as String?,
-      avatarId: (map['avatar_id'] as String?) ?? 'default_01',
+      avatarId: (map['avatar_id'] as String?) ?? 'male_01',
       photoFileName: map['photo_file_name'] as String?,
       active: (map['active'] as int) == 1,
       createdAt: DateTime.parse(map['created_at'] as String),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../avatar/screens/avatar_picker_screen.dart';
 import '../models/player.dart';
+import '../photo/services/photo_picker_service.dart';
+import '../photo/services/photo_storage_service.dart';
 import '../services/player_service.dart';
 import '../validators/player_validator.dart';
 
@@ -27,24 +29,41 @@ class PlayerFormState extends State<PlayerForm> {
 
   final PlayerService _service = PlayerService.instance;
 
+  final PhotoPickerService _photoPicker =
+      PhotoPickerService.instance;
+
+  final PhotoStorageService _photoStorage =
+      PhotoStorageService.instance;
+
   //----------------------------------------------------------------------------
   // Contrôleurs
   //----------------------------------------------------------------------------
 
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _nicknameController = TextEditingController();
+  final TextEditingController _lastNameController =
+      TextEditingController();
 
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _mobilePhoneController = TextEditingController();
+  final TextEditingController _firstNameController =
+      TextEditingController();
 
-  final TextEditingController _commentsController = TextEditingController();
+  final TextEditingController _nicknameController =
+      TextEditingController();
+
+  final TextEditingController _emailController =
+      TextEditingController();
+
+  final TextEditingController _mobilePhoneController =
+      TextEditingController();
+
+  final TextEditingController _commentsController =
+      TextEditingController();
 
   DateTime? _birthDate;
 
   bool _active = true;
 
   String _avatarId = 'male_01';
+
+  String? _photoFileName;
 
   String? _photoPath;
 
@@ -76,7 +95,7 @@ class PlayerFormState extends State<PlayerForm> {
   }
 
   //----------------------------------------------------------------------------
-  // Chargement d'un joueur
+  // Chargement
   //----------------------------------------------------------------------------
 
   void _loadPlayer(Player player) {
@@ -90,11 +109,24 @@ class PlayerFormState extends State<PlayerForm> {
     _commentsController.text = player.comments ?? '';
 
     _birthDate = player.birthDate;
+
     _active = player.active;
 
     _avatarId = player.avatarId;
 
-    _photoPath = null;
+    _photoFileName = player.photoFileName;
+
+    _loadPhoto();
+  }
+
+  Future<void> _loadPhoto() async {
+    _photoPath = await _photoStorage.getPhotoPath(
+      _photoFileName,
+    );
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -116,7 +148,7 @@ class PlayerFormState extends State<PlayerForm> {
         birthDate: _birthDate,
         comments: _commentsController.text,
         avatarId: _avatarId,
-        photoFileName: null,
+        photoFileName: _photoFileName,
         active: _active,
       );
     } else {
@@ -129,6 +161,7 @@ class PlayerFormState extends State<PlayerForm> {
         ..birthDate = _birthDate
         ..comments = _commentsController.text
         ..avatarId = _avatarId
+        ..photoFileName = _photoFileName
         ..active = _active;
 
       await _service.update(player);
@@ -231,13 +264,24 @@ class PlayerFormState extends State<PlayerForm> {
     });
   }
 
-  void _selectPhoto() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Import de photo disponible prochainement.',
-        ),
-      ),
-    );
+  Future<void> _selectPhoto() async {
+  final file = await _photoPicker.pickPhoto();
+
+  if (file == null) {
+    return;
+  }
+
+  // TODO : supprimer automatiquement l'ancienne photo
+  // lors du remplacement.
+
+  _photoFileName = await _photoStorage.importPhoto(file);
+
+  _photoPath = await _photoStorage.getPhotoPath(
+    _photoFileName,
+  );
+
+  if (mounted) {
+    setState(() {});
   }
 }
+  }

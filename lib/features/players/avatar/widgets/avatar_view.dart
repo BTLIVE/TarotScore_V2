@@ -1,3 +1,11 @@
+// ***************************************************************************
+// TarotScore V2
+//
+// Fichier : avatar_view.dart
+//
+// Description : Affichage de l'avatar ou de la photo d'un joueur.
+// ***************************************************************************
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,23 +26,42 @@ class AvatarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Photo du joueur
-    if (photoPath != null &&
-        photoPath!.isNotEmpty &&
-        File(photoPath!).existsSync()) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundImage: FileImage(
-          File(photoPath!),
-        ),
-      );
+    //----------------------------------------------------------------------
+    // Photo personnelle
+    //----------------------------------------------------------------------
+
+    if (photoPath != null && photoPath!.trim().isNotEmpty) {
+      final file = File(photoPath!);
+
+      if (file.existsSync()) {
+        return CircleAvatar(
+          radius: radius,
+          backgroundImage: FileImage(file),
+        );
+      }
     }
 
-    // Avatar
+    //----------------------------------------------------------------------
+    // Avatar par défaut
+    //----------------------------------------------------------------------
+
     return CircleAvatar(
       radius: radius,
-      backgroundImage: AssetImage(
-        AvatarService.instance.asset(avatarId),
+      backgroundColor: Colors.transparent,
+      child: ClipOval(
+        child: Image.asset(
+          AvatarService.instance.asset(avatarId),
+          width: radius * 2,
+          height: radius * 2,
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(
+              Icons.person,
+              size: radius,
+            );
+          },
+        ),
       ),
     );
   }

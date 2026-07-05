@@ -30,7 +30,7 @@ class AvatarTile extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: selected
-                ? theme.colorScheme.primary.withOpacity(0.10)
+                ? theme.colorScheme.primary.withValues(alpha: 0.10)
                 : null,
             border: Border.all(
               color: selected
@@ -41,7 +41,7 @@ class AvatarTile extends StatelessWidget {
             boxShadow: selected
                 ? [
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.25),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
