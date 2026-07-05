@@ -41,7 +41,8 @@ class Player {
     this.mobilePhone,
     this.birthDate,
     this.comments,
-    this.avatarId = 'default_01',
+    this.avatarId = 'male_01',
+    
     this.photoFileName,
     this.active = true,
     required this.createdAt,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../avatar/screens/avatar_picker_screen.dart';
 import '../models/player.dart';
 import '../services/player_service.dart';
 import '../validators/player_validator.dart';
@@ -40,7 +41,12 @@ class PlayerFormState extends State<PlayerForm> {
   final TextEditingController _commentsController = TextEditingController();
 
   DateTime? _birthDate;
+
   bool _active = true;
+
+  String _avatarId = 'male_01';
+
+  String? _photoPath;
 
   //----------------------------------------------------------------------------
   // Cycle de vie
@@ -85,6 +91,10 @@ class PlayerFormState extends State<PlayerForm> {
 
     _birthDate = player.birthDate;
     _active = player.active;
+
+    _avatarId = player.avatarId;
+
+    _photoPath = null;
   }
 
   //----------------------------------------------------------------------------
@@ -105,6 +115,8 @@ class PlayerFormState extends State<PlayerForm> {
         mobilePhone: _mobilePhoneController.text,
         birthDate: _birthDate,
         comments: _commentsController.text,
+        avatarId: _avatarId,
+        photoFileName: null,
         active: _active,
       );
     } else {
@@ -116,6 +128,7 @@ class PlayerFormState extends State<PlayerForm> {
         ..mobilePhone = _mobilePhoneController.text
         ..birthDate = _birthDate
         ..comments = _commentsController.text
+        ..avatarId = _avatarId
         ..active = _active;
 
       await _service.update(player);
@@ -123,8 +136,7 @@ class PlayerFormState extends State<PlayerForm> {
 
     return true;
   }
-
-  //----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
   // Interface
   //----------------------------------------------------------------------------
 
@@ -169,6 +181,8 @@ class PlayerFormState extends State<PlayerForm> {
           const SizedBox(height: 16),
 
           PlayerAvatarCard(
+            avatarId: _avatarId,
+            photoPath: _photoPath,
             onAvatarPressed: _selectAvatar,
             onPhotoPressed: _selectPhoto,
           ),
@@ -189,25 +203,40 @@ class PlayerFormState extends State<PlayerForm> {
       lastDate: DateTime.now(),
     );
 
-    if (date != null) {
-      setState(() {
-        _birthDate = date;
-      });
+    if (date == null) {
+      return;
     }
+
+    setState(() {
+      _birthDate = date;
+    });
   }
 
-  void _selectAvatar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Sélection d\'avatar à venir'),
+  Future<void> _selectAvatar() async {
+    final avatarId = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AvatarPickerScreen(
+          selectedAvatar: _avatarId,
+        ),
       ),
     );
+
+    if (avatarId == null) {
+      return;
+    }
+
+    setState(() {
+      _avatarId = avatarId;
+    });
   }
 
   void _selectPhoto() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Sélection de photo à venir'),
+        content: Text(
+          'Import de photo disponible prochainement.',
+        ),
       ),
     );
   }

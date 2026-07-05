@@ -50,7 +50,7 @@ class PlayerService {
     String? mobilePhone,
     DateTime? birthDate,
     String? comments,
-    String avatarId = 'default_01',
+    String avatarId = 'male_01',
     String? photoFileName,
     bool active = true,
   }) async {

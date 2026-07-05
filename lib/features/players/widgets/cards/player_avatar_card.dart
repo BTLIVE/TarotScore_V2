@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/section_card.dart';
+import '../../avatar/widgets/avatar_view.dart';
 
 class PlayerAvatarCard extends StatelessWidget {
   const PlayerAvatarCard({
     super.key,
+    required this.avatarId,
+    this.photoPath,
     required this.onAvatarPressed,
     required this.onPhotoPressed,
   });
+
+  final String avatarId;
+  final String? photoPath;
 
   final VoidCallback onAvatarPressed;
   final VoidCallback onPhotoPressed;
@@ -15,32 +21,36 @@ class PlayerAvatarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionCard(
-      title: 'Avatar et photo',
-      icon: Icons.image,
+      title: 'Avatar',
+      icon: Icons.account_circle,
       child: Column(
         children: [
-          const CircleAvatar(
-            radius: 48,
-            child: Icon(
-              Icons.person,
-              size: 48,
-            ),
+          AvatarView(
+            avatarId: avatarId,
+            photoPath: photoPath,
+            radius: 60,
           ),
 
           const SizedBox(height: 24),
 
-          FilledButton.icon(
-            onPressed: onAvatarPressed,
-            icon: const Icon(Icons.face),
-            label: const Text('Choisir un avatar'),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              icon: const Icon(Icons.face),
+              label: const Text('Modifier l\'avatar'),
+              onPressed: onAvatarPressed,
+            ),
           ),
 
           const SizedBox(height: 12),
 
-          OutlinedButton.icon(
-            onPressed: onPhotoPressed,
-            icon: const Icon(Icons.photo_camera),
-            label: const Text('Choisir une photo'),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.photo_camera),
+              label: const Text('Importer une photo'),
+              onPressed: onPhotoPressed,
+            ),
           ),
         ],
       ),

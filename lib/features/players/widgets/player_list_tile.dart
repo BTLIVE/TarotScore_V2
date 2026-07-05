@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../avatar/widgets/avatar_view.dart';
 import '../models/player.dart';
 
 class PlayerListTile extends StatelessWidget {
@@ -15,16 +16,13 @@ class PlayerListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        child: Text(
-          player.firstName.isNotEmpty
-              ? player.firstName[0].toUpperCase()
-              : '?',
-        ),
+      leading: AvatarView(
+        avatarId: player.avatarId,
+        radius: 22,
       ),
       title: Text(player.fullName),
       subtitle: Text(
-        player.nickname?.isNotEmpty == true
+        player.hasNickname
             ? player.nickname!
             : (player.email ?? ''),
       ),
