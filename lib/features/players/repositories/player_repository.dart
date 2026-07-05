@@ -1,20 +1,22 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../../../../../core/database/database_helper.dart';
-import '../../../../../core/database/tables/player_table.dart';
-import '../../../domain/player.dart';
+import '../../../core/database/database_helper.dart';
+import '../../../core/database/tables/player_table.dart';
+
+import '../models/player.dart';
 
 class PlayerRepository {
+  PlayerRepository();
+
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
-  /// Retourne l'instance de la base.
-  Future<Database> get _db async => await _databaseHelper.database;
+  Future<Database> get _db async => _databaseHelper.database;
 
   /// Ajoute un joueur.
   Future<int> insert(Player player) async {
     final db = await _db;
 
-    return await db.insert(
+    return db.insert(
       PlayerTable.tableName,
       player.toMap(),
     );
@@ -48,7 +50,7 @@ class PlayerRepository {
     return result.map(Player.fromMap).toList();
   }
 
-  /// Recherche un joueur par son id.
+  /// Recherche un joueur par son identifiant.
   Future<Player?> getById(int id) async {
     final db = await _db;
 
@@ -70,7 +72,7 @@ class PlayerRepository {
   Future<int> update(Player player) async {
     final db = await _db;
 
-    return await db.update(
+    return db.update(
       PlayerTable.tableName,
       player.toMap(),
       where: '${PlayerTable.id} = ?',
@@ -82,7 +84,7 @@ class PlayerRepository {
   Future<int> deactivate(int id) async {
     final db = await _db;
 
-    return await db.update(
+    return db.update(
       PlayerTable.tableName,
       {
         PlayerTable.active: 0,
@@ -96,7 +98,7 @@ class PlayerRepository {
   Future<int> delete(int id) async {
     final db = await _db;
 
-    return await db.delete(
+    return db.delete(
       PlayerTable.tableName,
       where: '${PlayerTable.id} = ?',
       whereArgs: [id],

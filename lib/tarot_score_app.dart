@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/router/app_router.dart';
+import 'core/router/app_routes.dart';
 import 'core/theme/app_theme.dart';
 
 class TarotScoreApp extends StatelessWidget {
@@ -15,7 +16,7 @@ class TarotScoreApp extends StatelessWidget {
 
       theme: AppTheme.light,
 
-      initialRoute: AppRouter.home,
+      initialRoute: AppRoutes.home,
 
       onGenerateRoute: AppRouter.onGenerateRoute,
     );

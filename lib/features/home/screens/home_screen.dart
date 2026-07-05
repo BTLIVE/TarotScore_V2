@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/router/app_router.dart';
+import '../../../core/router/app_routes.dart';
 import '../../../core/widgets/dashboard_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.pushNamed(
                   context,
-                  AppRouter.players,
+                  AppRoutes.players,
                 );
               },
             ),
