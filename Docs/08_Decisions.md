@@ -227,3 +227,6 @@ ou
 - une nouvelle décision est créée.
 
 L'historique des décisions est conservé pendant toute la durée de vie du projet.
+
+D-009 — Avant la version bêta, la base de données peut être recréée lors d'une évolution majeure du modèle. À partir de la bêta, toutes les évolutions doivent être réalisées par migration afin de préserver les données utilisateur.
+

@@ -1,22 +1,22 @@
-# Changelog
-
-## v2.0.0-alpha1
+## v2.0.0-alpha1 — 05/07/2026
 
 ### Infrastructure
-- Nouvelle architecture Feature First
-- Core
-- Router
-- Theme
-- Widgets communs
-
-### Base de données
-- SQLite
-- PlayerRepository
-- PlayerService
+- Architecture Feature First
+- Navigation
+- Base SQLite
+- Documentation complète
+- Structure Git
 
 ### Modules
 - Home
-- Players
+- Players (fondations)
 
-### Git
-- Premier commit
+### Documentation
+- Vision
+- Architecture
+- Base de données
+- Règles métier
+- Rule Engine
+- Catalogue des règles
+- UI/UX
+- Fonctionnalités

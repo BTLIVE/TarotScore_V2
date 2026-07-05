@@ -1,38 +1,65 @@
-import '../../../../../core/database/tables/player_table.dart';
-
-/// Représente un joueur de TarotScore.
 class Player {
   final int? id;
-  final String uuid;
-  final String firstName;
-  final String lastName;
-  final String? nickname;
-  final String? email;
-  final String? phone;
-  final String? avatar;
-  final bool active;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
-  const Player({
+  /// Identifiant unique permanent.
+  final String uuid;
+
+  /// Informations générales
+  String firstName;
+  String lastName;
+  String? nickname;
+
+  /// Contact
+  String? email;
+  String? mobilePhone;
+
+  /// Informations personnelles
+  DateTime? birthDate;
+  String? comments;
+
+  /// Identité visuelle
+  String avatarId;
+
+  /// Nom du fichier de la photo.
+  /// Le chemin complet est reconstruit par PhotoStorageService.
+  String? photoFileName;
+
+  /// État du joueur
+  bool active;
+
+  /// Audit
+  final DateTime createdAt;
+  DateTime updatedAt;
+
+  Player({
     this.id,
     required this.uuid,
     required this.firstName,
     required this.lastName,
     this.nickname,
     this.email,
-    this.phone,
-    this.avatar,
+    this.mobilePhone,
+    this.birthDate,
+    this.comments,
+    this.avatarId = 'default_01',
+    this.photoFileName,
     this.active = true,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  /// Nom complet du joueur.
+  /// Nom complet.
   String get fullName => '$firstName $lastName';
 
-  /// Retourne un nouveau Player en modifiant uniquement
-  /// les propriétés renseignées.
+  /// Nom affiché dans l'application.
+  String get displayName {
+    if (nickname != null && nickname!.trim().isNotEmpty) {
+      return nickname!;
+    }
+
+    return fullName;
+  }
+
   Player copyWith({
     int? id,
     String? uuid,
@@ -40,8 +67,11 @@ class Player {
     String? lastName,
     String? nickname,
     String? email,
-    String? phone,
-    String? avatar,
+    String? mobilePhone,
+    DateTime? birthDate,
+    String? comments,
+    String? avatarId,
+    String? photoFileName,
     bool? active,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -53,50 +83,54 @@ class Player {
       lastName: lastName ?? this.lastName,
       nickname: nickname ?? this.nickname,
       email: email ?? this.email,
-      phone: phone ?? this.phone,
-      avatar: avatar ?? this.avatar,
+      mobilePhone: mobilePhone ?? this.mobilePhone,
+      birthDate: birthDate ?? this.birthDate,
+      comments: comments ?? this.comments,
+      avatarId: avatarId ?? this.avatarId,
+      photoFileName: photoFileName ?? this.photoFileName,
       active: active ?? this.active,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
-  /// Conversion vers une Map pour SQLite.
-  Map<String, dynamic> toMap() {
-    return {
-      PlayerTable.id: id,
-      PlayerTable.uuid: uuid,
-      PlayerTable.firstName: firstName,
-      PlayerTable.lastName: lastName,
-      PlayerTable.nickname: nickname,
-      PlayerTable.email: email,
-      PlayerTable.phone: phone,
-      PlayerTable.avatar: avatar,
-      PlayerTable.active: active ? 1 : 0,
-      PlayerTable.createdAt: createdAt.toIso8601String(),
-      PlayerTable.updatedAt: updatedAt.toIso8601String(),
-    };
-  }
-
-  /// Création d'un Player à partir d'une Map SQLite.
   factory Player.fromMap(Map<String, dynamic> map) {
     return Player(
-      id: map[PlayerTable.id] as int?,
-      uuid: map[PlayerTable.uuid] as String,
-      firstName: map[PlayerTable.firstName] as String,
-      lastName: map[PlayerTable.lastName] as String,
-      nickname: map[PlayerTable.nickname] as String?,
-      email: map[PlayerTable.email] as String?,
-      phone: map[PlayerTable.phone] as String?,
-      avatar: map[PlayerTable.avatar] as String?,
-      active: (map[PlayerTable.active] as int) == 1,
-      createdAt: DateTime.parse(map[PlayerTable.createdAt] as String),
-      updatedAt: DateTime.parse(map[PlayerTable.updatedAt] as String),
+      id: map['id'] as int?,
+      uuid: map['uuid'] as String,
+      firstName: map['first_name'] as String,
+      lastName: map['last_name'] as String,
+      nickname: map['nickname'] as String?,
+      email: map['email'] as String?,
+      mobilePhone: map['mobile_phone'] as String?,
+      birthDate: map['birth_date'] != null
+          ? DateTime.parse(map['birth_date'] as String)
+          : null,
+      comments: map['comments'] as String?,
+      avatarId: (map['avatar_id'] as String?) ?? 'default_01',
+      photoFileName: map['photo_file_name'] as String?,
+      active: (map['active'] as int) == 1,
+      createdAt: DateTime.parse(map['created_at'] as String),
+      updatedAt: DateTime.parse(map['updated_at'] as String),
     );
   }
 
-  @override
-  String toString() {
-    return 'Player(id: $id, name: $fullName)';
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'uuid': uuid,
+      'first_name': firstName,
+      'last_name': lastName,
+      'nickname': nickname,
+      'email': email,
+      'mobile_phone': mobilePhone,
+      'birth_date': birthDate?.toIso8601String(),
+      'comments': comments,
+      'avatar_id': avatarId,
+      'photo_file_name': photoFileName,
+      'active': active ? 1 : 0,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
   }
 }

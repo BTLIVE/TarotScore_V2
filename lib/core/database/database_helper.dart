@@ -11,7 +11,7 @@ class DatabaseHelper {
   static Database? _database;
 
   static const String databaseName = 'tarot_score.db';
-  static const int databaseVersion = 1;
+  static const int databaseVersion = 2;
 
   Future<Database> get database async {
     if (_database != null) {

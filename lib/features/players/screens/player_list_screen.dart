@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/app_page.dart';
 import '../models/player.dart';
 import '../services/player_service.dart';
-import '../widgets/player_tile.dart';
+import 'player_form_screen.dart';
 
 class PlayerListScreen extends StatefulWidget {
   const PlayerListScreen({super.key});
@@ -13,9 +12,11 @@ class PlayerListScreen extends StatefulWidget {
 }
 
 class _PlayerListScreenState extends State<PlayerListScreen> {
-  final PlayerService _playerService = PlayerService.instance;
+  final PlayerService _service = PlayerService.instance;
 
-  late Future<List<Player>> _playersFuture;
+  List<Player> _players = [];
+
+  bool _loading = true;
 
   @override
   void initState() {
@@ -23,72 +24,92 @@ class _PlayerListScreenState extends State<PlayerListScreen> {
     _loadPlayers();
   }
 
-  void _loadPlayers() {
-    _playersFuture = _playerService.getPlayers();
+  Future<void> _loadPlayers() async {
+    final players = await _service.getAll();
+
+    if (!mounted) return;
+
+    setState(() {
+      _players = players;
+      _loading = false;
+    });
+  }
+
+  Future<void> _createPlayer() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const PlayerFormScreen(),
+      ),
+    );
+
+    if (result == true) {
+      await _loadPlayers();
+    }
+  }
+
+  Future<void> _editPlayer(Player player) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PlayerFormScreen(
+          player: player,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      await _loadPlayers();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppPage(
-      title: 'Joueurs',
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO : ouvrir le formulaire d'ajout
-        },
-        child: const Icon(Icons.add),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Joueurs'),
       ),
-
-      body: FutureBuilder<List<Player>>(
-        future: _playersFuture,
-        builder: (context, snapshot) {
-          // Chargement
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _createPlayer,
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter'),
+      ),
+      body: _loading
+          ? const Center(
               child: CircularProgressIndicator(),
-            );
-          }
+            )
+          : _players.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Aucun joueur',
+                  ),
+                )
+              : ListView.separated(
+                  itemCount: _players.length,
+separatorBuilder: (context, index) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final player = _players[index];
 
-          // Erreur
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Erreur : ${snapshot.error}',
-              ),
-            );
-          }
-
-          final players = snapshot.data ?? [];
-
-          // Aucun joueur
-          if (players.isEmpty) {
-            return const Center(
-              child: Text(
-                'Aucun joueur enregistré',
-                style: TextStyle(
-                  fontSize: 18,
+                    return ListTile(
+                      leading: CircleAvatar(
+                        child: Text(
+                          player.firstName.isNotEmpty
+                              ? player.firstName[0].toUpperCase()
+                              : '?',
+                        ),
+                      ),
+                      title: Text(player.displayName),
+                      subtitle: Text(player.fullName),
+                      trailing: player.active
+                          ? null
+                          : const Icon(
+                              Icons.block,
+                              color: Colors.red,
+                            ),
+                      onTap: () => _editPlayer(player),
+                    );
+                  },
                 ),
-              ),
-            );
-          }
-
-          // Liste des joueurs
-          return ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: players.length,
-            itemBuilder: (context, index) {
-              final player = players[index];
-
-              return PlayerTile(
-                player: player,
-                onTap: () {
-                  // TODO : modification du joueur
-                },
-              );
-            },
-          );
-        },
-      ),
     );
   }
 }
