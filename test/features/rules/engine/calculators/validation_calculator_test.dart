@@ -1,50 +1,72 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:tarotscore_v2/features/players/models/player.dart';
 import 'package:tarotscore_v2/features/rules/engine/calculators/validation_calculator.dart';
 import 'package:tarotscore_v2/features/rules/engine/exceptions/invalid_deal_exception.dart';
 import 'package:tarotscore_v2/features/rules/engine/pipeline/deal_calculation.dart';
 import 'package:tarotscore_v2/features/rules/factories/official_rule_profiles.dart';
 import 'package:tarotscore_v2/features/sessions/models/deal.dart';
-import 'package:tarotscore_v2/features/sessions/models/session.dart';
 
 void main() {
   const calculator = ValidationCalculator();
 
   final profile = OfficialRuleProfiles.fft();
 
-  final session = Session(
-    uuid: const Uuid().v4(),
-    ruleProfile: profile,
-    players: const <Player>[],
-  );
-
   DealCalculation createCalculation({
     String contractId = 'garde',
     int oudlers = 2,
     double points = 46,
+    int playerCount = 4,
+    bool hasCalledPartner = false,
+    int? partnerPosition,
   }) {
     final deal = Deal(
       uuid: const Uuid().v4(),
       number: 1,
       attackerPosition: 0,
+      hasCalledPartner: hasCalledPartner,
+      partnerPosition: partnerPosition,
       contractId: contractId,
       oudlers: oudlers,
       points: points,
     );
 
     return DealCalculation(
-      session: session,
+      profile: profile,
+      playerCount: playerCount,
       deal: deal,
     );
   }
 
   group('ValidationCalculator', () {
-    test('Valid deal', () {
+    test('Valid deal (4 players)', () {
       expect(
         () => calculator.calculate(
           createCalculation(),
+        ),
+        returnsNormally,
+      );
+    });
+
+    test('Valid deal (5 players with partner)', () {
+      expect(
+        () => calculator.calculate(
+          createCalculation(
+            playerCount: 5,
+            hasCalledPartner: true,
+            partnerPosition: 2,
+          ),
+        ),
+        returnsNormally,
+      );
+    });
+
+    test('Valid deal (5 players alone)', () {
+      expect(
+        () => calculator.calculate(
+          createCalculation(
+            playerCount: 5,
+          ),
         ),
         returnsNormally,
       );
@@ -57,9 +79,7 @@ void main() {
             contractId: 'super_garde',
           ),
         ),
-        throwsA(
-          isA<InvalidDealException>(),
-        ),
+        throwsA(isA<InvalidDealException>()),
       );
     });
 
@@ -70,9 +90,7 @@ void main() {
             oudlers: 4,
           ),
         ),
-        throwsA(
-          isA<InvalidDealException>(),
-        ),
+        throwsA(isA<InvalidDealException>()),
       );
     });
 
@@ -83,9 +101,44 @@ void main() {
             points: 120,
           ),
         ),
-        throwsA(
-          isA<InvalidDealException>(),
+        throwsA(isA<InvalidDealException>()),
+      );
+    });
+
+    test('Partner required at 5 players', () {
+      expect(
+        () => calculator.calculate(
+          createCalculation(
+            playerCount: 5,
+            hasCalledPartner: true,
+          ),
         ),
+        throwsA(isA<InvalidDealException>()),
+      );
+    });
+
+    test('Partner forbidden at 4 players', () {
+      expect(
+        () => calculator.calculate(
+          createCalculation(
+            hasCalledPartner: true,
+            partnerPosition: 1,
+          ),
+        ),
+        throwsA(isA<InvalidDealException>()),
+      );
+    });
+
+    test('Partner cannot be attacker', () {
+      expect(
+        () => calculator.calculate(
+          createCalculation(
+            playerCount: 5,
+            hasCalledPartner: true,
+            partnerPosition: 0,
+          ),
+        ),
+        throwsA(isA<InvalidDealException>()),
       );
     });
   });

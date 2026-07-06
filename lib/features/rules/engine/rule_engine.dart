@@ -9,7 +9,7 @@
 // ***************************************************************************
 
 import '../../sessions/models/deal.dart';
-import '../../sessions/models/session.dart';
+import '../models/rule_profile.dart';
 import 'calculators/calculator.dart';
 import 'pipeline/deal_calculation.dart';
 
@@ -20,12 +20,18 @@ class RuleEngine {
     required Iterable<Calculator> calculators,
   }) : _calculators = List.unmodifiable(calculators);
 
+  //--------------------------------------------------------------------------
+  // Calcul
+  //--------------------------------------------------------------------------
+
   DealCalculation calculate({
-    required Session session,
+    required RuleProfile profile,
+    required int playerCount,
     required Deal deal,
   }) {
     var calculation = DealCalculation(
-      session: session,
+      profile: profile,
+      playerCount: playerCount,
       deal: deal,
     );
 

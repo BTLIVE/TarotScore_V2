@@ -37,6 +37,9 @@ class Session {
   /// Joueurs participant à la session.
   final List<Player> players;
 
+  /// Position du premier donneur.
+  final int firstDealerPosition;
+
   //--------------------------------------------------------------------------
   // Manches
   //--------------------------------------------------------------------------
@@ -52,6 +55,7 @@ class Session {
     required this.uuid,
     required this.ruleProfile,
     required this.players,
+    required this.firstDealerPosition,
     this.deals = const [],
   });
 
@@ -59,7 +63,6 @@ class Session {
   // Getters métier
   //--------------------------------------------------------------------------
 
-  /// Nombre de joueurs.
   int get playerCount => players.length;
 
   bool get isThreePlayers => playerCount == 3;
@@ -80,12 +83,15 @@ class Session {
     String? uuid,
     RuleProfile? ruleProfile,
     List<Player>? players,
+    int? firstDealerPosition,
     List<Deal>? deals,
   }) {
     return Session(
       uuid: uuid ?? this.uuid,
       ruleProfile: ruleProfile ?? this.ruleProfile,
       players: players ?? this.players,
+      firstDealerPosition:
+          firstDealerPosition ?? this.firstDealerPosition,
       deals: deals ?? this.deals,
     );
   }
@@ -98,6 +104,7 @@ class Session {
   String toString() {
     return 'Session('
         'players: ${players.length}, '
+        'dealer: $firstDealerPosition, '
         'deals: ${deals.length}'
         ')';
   }
@@ -107,12 +114,15 @@ class Session {
     return identical(this, other) ||
         other is Session &&
             other.uuid == uuid &&
-            other.ruleProfile == ruleProfile;
+            other.ruleProfile == ruleProfile &&
+            other.firstDealerPosition ==
+                firstDealerPosition;
   }
 
   @override
   int get hashCode => Object.hash(
         uuid,
         ruleProfile,
+        firstDealerPosition,
       );
 }

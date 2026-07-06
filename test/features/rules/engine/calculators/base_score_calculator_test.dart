@@ -1,23 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:tarotscore_v2/features/players/models/player.dart';
 import 'package:tarotscore_v2/features/rules/engine/calculators/base_score_calculator.dart';
 import 'package:tarotscore_v2/features/rules/engine/pipeline/deal_calculation.dart';
 import 'package:tarotscore_v2/features/rules/factories/official_rule_profiles.dart';
 import 'package:tarotscore_v2/features/sessions/models/deal.dart';
-import 'package:tarotscore_v2/features/sessions/models/session.dart';
 
 void main() {
   const calculator = BaseScoreCalculator();
 
   final profile = OfficialRuleProfiles.fft();
-
-  final session = Session(
-    uuid: const Uuid().v4(),
-    ruleProfile: profile,
-    players: const <Player>[],
-  );
 
   DealCalculation createCalculation({
     required int oudlers,
@@ -33,7 +25,8 @@ void main() {
     );
 
     return DealCalculation(
-      session: session,
+      profile: profile,
+      playerCount: 4,
       deal: deal,
     );
   }

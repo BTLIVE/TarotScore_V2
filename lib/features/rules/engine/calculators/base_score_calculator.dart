@@ -23,7 +23,7 @@ class BaseScoreCalculator implements Calculator {
   DealCalculation calculate(
     DealCalculation calculation,
   ) {
-    final target = calculation.session.ruleProfile.targetScore(
+    final target = calculation.profile.targetScore(
       calculation.deal.oudlers,
     );
 

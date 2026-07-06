@@ -1,40 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:tarotscore_v2/features/players/models/player.dart';
 import 'package:tarotscore_v2/features/rules/engine/calculators/score_distribution_calculator.dart';
 import 'package:tarotscore_v2/features/rules/engine/pipeline/deal_calculation.dart';
 import 'package:tarotscore_v2/features/rules/factories/official_rule_profiles.dart';
 import 'package:tarotscore_v2/features/sessions/models/deal.dart';
-import 'package:tarotscore_v2/features/sessions/models/session.dart';
 
 void main() {
   const calculator = ScoreDistributionCalculator();
 
   final profile = OfficialRuleProfiles.fft();
-
-  Player player(int index) {
-    final now = DateTime.now();
-
-    return Player(
-      uuid: const Uuid().v4(),
-      firstName: 'P$index',
-      lastName: 'Test',
-      createdAt: now,
-      updatedAt: now,
-    );
-  }
-
-  Session createSession(int playerCount) {
-    return Session(
-      uuid: const Uuid().v4(),
-      ruleProfile: profile,
-      players: List.generate(
-        playerCount,
-        player,
-      ),
-    );
-  }
 
   DealCalculation createCalculation({
     required int playerCount,
@@ -55,16 +30,15 @@ void main() {
     );
 
     return DealCalculation(
-      session: createSession(playerCount),
+      profile: profile,
+      playerCount: playerCount,
       deal: deal,
       contractScore: score,
     );
   }
 
   group('ScoreDistributionCalculator', () {
-
     test('4 joueurs', () {
-
       final result = calculator.calculate(
         createCalculation(
           playerCount: 4,
@@ -85,7 +59,6 @@ void main() {
     });
 
     test('5 joueurs avec appelé', () {
-
       final result = calculator.calculate(
         createCalculation(
           playerCount: 5,
@@ -109,7 +82,6 @@ void main() {
     });
 
     test('5 joueurs preneur seul', () {
-
       final result = calculator.calculate(
         createCalculation(
           playerCount: 5,
@@ -130,5 +102,21 @@ void main() {
       );
     });
 
+    test('Somme des scores égale à zéro', () {
+      final result = calculator.calculate(
+        createCalculation(
+          playerCount: 5,
+          attacker: 2,
+          score: 84,
+        ),
+      );
+
+      final total = result.playerScores!.values.fold(
+        0,
+        (sum, value) => sum + value,
+      );
+
+      expect(total, 0);
+    });
   });
 }

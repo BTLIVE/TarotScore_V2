@@ -26,13 +26,20 @@ class SessionService {
   Session create({
     required RuleProfile ruleProfile,
     required List<Player> players,
+    required int firstDealerPosition,
   }) {
     _validatePlayers(players);
+
+    _validateFirstDealer(
+      firstDealerPosition,
+      players.length,
+    );
 
     return Session(
       uuid: _uuid.v4(),
       ruleProfile: ruleProfile,
       players: List.unmodifiable(players),
+      firstDealerPosition: firstDealerPosition,
     );
   }
 
@@ -56,6 +63,17 @@ class SessionService {
     if (uuids.length != players.length) {
       throw ArgumentError(
         'Un joueur est présent plusieurs fois.',
+      );
+    }
+  }
+
+  void _validateFirstDealer(
+    int dealer,
+    int playerCount,
+  ) {
+    if (dealer < 0 || dealer >= playerCount) {
+      throw ArgumentError(
+        'Position du premier donneur invalide.',
       );
     }
   }

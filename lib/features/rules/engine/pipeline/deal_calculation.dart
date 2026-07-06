@@ -9,14 +9,25 @@
 // ***************************************************************************
 
 import '../../../sessions/models/deal.dart';
-import '../../../sessions/models/session.dart';
+import '../../models/rule_profile.dart';
 
 class DealCalculation {
-  /// Session en cours.
-  final Session session;
+  //--------------------------------------------------------------------------
+  // Contexte
+  //--------------------------------------------------------------------------
+
+  /// Profil de règles utilisé.
+  final RuleProfile profile;
+
+  /// Nombre de joueurs de la partie.
+  final int playerCount;
 
   /// Manche à calculer.
   final Deal deal;
+
+  //--------------------------------------------------------------------------
+  // Résultats intermédiaires
+  //--------------------------------------------------------------------------
 
   /// Contrat réussi.
   final bool? success;
@@ -33,8 +44,13 @@ class DealCalculation {
   /// Valeur : score de la manche.
   final Map<int, int>? playerScores;
 
+  //--------------------------------------------------------------------------
+  // Constructeur
+  //--------------------------------------------------------------------------
+
   const DealCalculation({
-    required this.session,
+    required this.profile,
+    required this.playerCount,
     required this.deal,
     this.success,
     this.baseScore,
@@ -42,8 +58,13 @@ class DealCalculation {
     this.playerScores,
   });
 
+  //--------------------------------------------------------------------------
+  // Copy
+  //--------------------------------------------------------------------------
+
   DealCalculation copyWith({
-    Session? session,
+    RuleProfile? profile,
+    int? playerCount,
     Deal? deal,
     bool? success,
     int? baseScore,
@@ -51,7 +72,8 @@ class DealCalculation {
     Map<int, int>? playerScores,
   }) {
     return DealCalculation(
-      session: session ?? this.session,
+      profile: profile ?? this.profile,
+      playerCount: playerCount ?? this.playerCount,
       deal: deal ?? this.deal,
       success: success ?? this.success,
       baseScore: baseScore ?? this.baseScore,

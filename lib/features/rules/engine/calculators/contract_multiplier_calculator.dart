@@ -20,8 +20,9 @@ class ContractMultiplierCalculator implements Calculator {
     DealCalculation calculation,
   ) {
     final baseScore = calculation.baseScore;
+    final success = calculation.success;
 
-    if (baseScore == null) {
+    if (baseScore == null || success == null) {
       throw InvalidDealException(
         'Le score de base doit être calculé avant le multiplicateur.',
       );
@@ -37,8 +38,12 @@ class ContractMultiplierCalculator implements Calculator {
         ),
     };
 
+    final contractScore = baseScore * multiplier;
+
     return calculation.copyWith(
-      contractScore: baseScore * multiplier,
+      contractScore: success
+          ? contractScore
+          : -contractScore,
     );
   }
 }

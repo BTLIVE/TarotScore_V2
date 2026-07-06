@@ -25,11 +25,16 @@ class ValidationCalculator implements Calculator {
   DealCalculation calculate(
     DealCalculation calculation,
   ) {
-    final profile = calculation.session.ruleProfile;
+    final profile = calculation.profile;
     final deal = calculation.deal;
 
     _validateContract(
       profile,
+      deal,
+    );
+
+    _validatePlayers(
+      calculation.playerCount,
       deal,
     );
 
@@ -66,6 +71,59 @@ class ValidationCalculator implements Calculator {
       throw InvalidDealException(
         'Contrat désactivé : ${deal.contractId}',
       );
+    }
+  }
+
+  //--------------------------------------------------------------------------
+  // Joueurs
+  //--------------------------------------------------------------------------
+
+  void _validatePlayers(
+    int playerCount,
+    Deal deal,
+  ) {
+    switch (playerCount) {
+      case 4:
+        if (deal.hasCalledPartner) {
+          throw InvalidDealException(
+            'À 4 joueurs, il ne peut pas y avoir d\'appelé.',
+          );
+        }
+
+        if (deal.partnerPosition != null) {
+          throw InvalidDealException(
+            'À 4 joueurs, partnerPosition doit être null.',
+          );
+        }
+        break;
+
+      case 5:
+        if (deal.hasCalledPartner) {
+          if (deal.partnerPosition == null) {
+            throw InvalidDealException(
+              'Le partenaire est obligatoire.',
+            );
+          }
+
+          if (deal.partnerPosition ==
+              deal.attackerPosition) {
+            throw InvalidDealException(
+              'Le partenaire ne peut pas être le preneur.',
+            );
+          }
+        } else {
+          if (deal.partnerPosition != null) {
+            throw InvalidDealException(
+              'partnerPosition doit être null lorsque le preneur joue seul.',
+            );
+          }
+        }
+        break;
+
+      default:
+        throw InvalidDealException(
+          'Seules les parties à 4 et 5 joueurs sont supportées.',
+        );
     }
   }
 

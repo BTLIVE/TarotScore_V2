@@ -19,7 +19,6 @@ class ScoreDistributionCalculator implements Calculator {
   DealCalculation calculate(
     DealCalculation calculation,
   ) {
-    final session = calculation.session;
     final deal = calculation.deal;
     final score = calculation.contractScore;
 
@@ -29,32 +28,35 @@ class ScoreDistributionCalculator implements Calculator {
       );
     }
 
-    if (session.isFourPlayers) {
-      return _fourPlayers(
-        calculation,
-        score,
-      );
-    }
-
-    if (session.isFivePlayers) {
-      if (deal.hasCalledPartner) {
-        return _fivePlayersWithPartner(
+    switch (calculation.playerCount) {
+      case 4:
+        return _fourPlayers(
           calculation,
           score,
         );
-      }
 
-      return _fivePlayersAlone(
-        calculation,
-        score,
-      );
+      case 5:
+        if (deal.hasCalledPartner) {
+          return _fivePlayersWithPartner(
+            calculation,
+            score,
+          );
+        }
+
+        return _fivePlayersAlone(
+          calculation,
+          score,
+        );
+
+      default:
+        throw InvalidDealException(
+          'Nombre de joueurs non supporté.',
+        );
     }
-
-    throw InvalidDealException(
-      'Nombre de joueurs non supporté.',
-    );
   }
 
+  //--------------------------------------------------------------------------
+  // 4 joueurs
   //--------------------------------------------------------------------------
 
   DealCalculation _fourPlayers(
@@ -77,6 +79,8 @@ class ScoreDistributionCalculator implements Calculator {
   }
 
   //--------------------------------------------------------------------------
+  // 5 joueurs avec appelé
+  //--------------------------------------------------------------------------
 
   DealCalculation _fivePlayersWithPartner(
     DealCalculation calculation,
@@ -87,6 +91,12 @@ class ScoreDistributionCalculator implements Calculator {
     if (partner == null) {
       throw InvalidDealException(
         'Le partenaire est obligatoire.',
+      );
+    }
+
+    if (partner == calculation.deal.attackerPosition) {
+      throw InvalidDealException(
+        'Le partenaire ne peut pas être le preneur.',
       );
     }
 
@@ -106,6 +116,8 @@ class ScoreDistributionCalculator implements Calculator {
     );
   }
 
+  //--------------------------------------------------------------------------
+  // 5 joueurs, preneur seul
   //--------------------------------------------------------------------------
 
   DealCalculation _fivePlayersAlone(
@@ -128,13 +140,15 @@ class ScoreDistributionCalculator implements Calculator {
   }
 
   //--------------------------------------------------------------------------
+  // Vérification
+  //--------------------------------------------------------------------------
 
   void _checkBalance(
     Map<int, int> scores,
   ) {
     final total = scores.values.fold(
       0,
-      (a, b) => a + b,
+      (sum, value) => sum + value,
     );
 
     if (total != 0) {
