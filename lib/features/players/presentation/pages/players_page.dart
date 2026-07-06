@@ -128,7 +128,7 @@ class _PlayersPageState
           return ListView.separated(
             itemCount: players.length,
 
-            separatorBuilder: (_, __) =>
+            separatorBuilder: (context, index) =>
                 const Divider(height: 1),
 
             itemBuilder: (context, index) {

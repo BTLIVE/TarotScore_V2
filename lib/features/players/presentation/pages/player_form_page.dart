@@ -52,13 +52,11 @@ class _PlayerFormPageState
           ? 'Nouveau joueur'
           : 'Modifier un joueur',
 
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.save),
-          tooltip: 'Enregistrer',
-          onPressed: _save,
-        ),
-      ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _save,
+        icon: const Icon(Icons.save),
+        label: const Text('Enregistrer'),
+      ),
 
       child: PlayerForm(
         key: _formKey,

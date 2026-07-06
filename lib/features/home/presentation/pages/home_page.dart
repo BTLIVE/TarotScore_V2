@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  void _notImplemented(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Fonctionnalité en cours de développement',
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,46 +30,65 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment:
               CrossAxisAlignment.stretch,
-          children: const [
-            SizedBox(height: AppSpacing.md),
+          children: [
+            const SizedBox(height: AppSpacing.md),
 
-            Text(
+            const Text(
               'Bienvenue',
               style: AppTextStyles.title,
               textAlign: TextAlign.center,
             ),
 
-            SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.xl),
 
             _HomeButton(
               icon: Icons.play_arrow,
               title: 'Nouvelle partie',
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.newSession,
+                );
+              },
             ),
 
-            SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
 
             _HomeButton(
               icon: Icons.people,
               title: 'Joueurs',
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.players,
+                );
+              },
             ),
 
-            SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
 
             _HomeButton(
               icon: Icons.history,
               title: 'Historique',
+              onPressed: () => _notImplemented(context),
             ),
 
-            SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
 
             _HomeButton(
               icon: Icons.settings,
               title: 'Paramètres',
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.settings,
+                );
+              },
             ),
 
-            Spacer(),
+            const Spacer(),
 
-            Text(
+            const Text(
               'Version 2.0',
               textAlign: TextAlign.center,
               style: AppTextStyles.caption,
@@ -73,16 +103,18 @@ class HomePage extends StatelessWidget {
 class _HomeButton extends StatelessWidget {
   final IconData icon;
   final String title;
+  final VoidCallback onPressed;
 
   const _HomeButton({
     required this.icon,
     required this.title,
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return FilledButton.icon(
-      onPressed: () {},
+      onPressed: onPressed,
       icon: Icon(icon),
       label: Padding(
         padding: const EdgeInsets.symmetric(
