@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/player.dart';
 import '../services/player_service.dart';
-import '../widgets/player_list_tile.dart';
+import '../presentation/widgets/player_list_tile.dart';
 import 'player_form_screen.dart';
 
 class PlayerListScreen extends StatefulWidget {

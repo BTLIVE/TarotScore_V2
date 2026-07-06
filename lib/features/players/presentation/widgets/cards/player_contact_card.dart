@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/section_card.dart';
+import '../../../../../core/widgets/section_card.dart';
 
 class PlayerContactCard extends StatelessWidget {
   const PlayerContactCard({

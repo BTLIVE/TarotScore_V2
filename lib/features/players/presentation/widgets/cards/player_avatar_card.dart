@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/section_card.dart';
-import '../../avatar/widgets/avatar_view.dart';
+import '../../../../../core/widgets/section_card.dart';
+import '../../../avatar/widgets/avatar_view.dart';
 
 class PlayerAvatarCard extends StatelessWidget {
   const PlayerAvatarCard({

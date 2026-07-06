@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/player.dart';
-import '../widgets/player_form.dart';
+import '../presentation/widgets/player_form.dart';
 
 class PlayerFormScreen extends StatefulWidget {
   const PlayerFormScreen({

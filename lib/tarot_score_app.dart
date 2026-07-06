@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'core/router/app_router.dart';
-import 'core/router/app_routes.dart';
+import 'core/routing/app_router.dart';
+import 'core/routing/app_routes.dart';
 import 'core/theme/app_theme.dart';
 
 class TarotScoreApp extends StatelessWidget {
@@ -16,9 +16,14 @@ class TarotScoreApp extends StatelessWidget {
 
       theme: AppTheme.light,
 
+      themeMode: ThemeMode.light,
+
       initialRoute: AppRoutes.home,
 
       onGenerateRoute: AppRouter.onGenerateRoute,
+
+      // Très utile plus tard
+      restorationScopeId: 'tarotscore',
     );
   }
 }

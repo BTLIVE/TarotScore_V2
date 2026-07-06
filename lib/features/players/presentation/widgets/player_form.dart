@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../avatar/screens/avatar_picker_screen.dart';
-import '../models/player.dart';
-import '../photo/services/photo_picker_service.dart';
-import '../photo/services/photo_storage_service.dart';
-import '../services/player_service.dart';
-import '../validators/player_validator.dart';
+import '../../avatar/screens/avatar_picker_screen.dart';
+import '../../models/player.dart';
+import '../../photo/services/photo_picker_service.dart';
+import '../../photo/services/photo_storage_service.dart';
+import '../../services/player_service.dart';
+import '../../validators/player_validator.dart';
 
 import 'cards/player_avatar_card.dart';
 import 'cards/player_contact_card.dart';

@@ -1,12 +1,17 @@
 class AppRoutes {
-  AppRoutes._();
+  const AppRoutes._();
 
   static const home = '/';
+
   static const players = '/players';
 
-  // À venir
-  static const sessions = '/sessions';
+  static const newSession = '/new-session';
+
+  static const currentSession = '/current-session';
+
   static const statistics = '/statistics';
+
   static const settings = '/settings';
+
   static const about = '/about';
 }

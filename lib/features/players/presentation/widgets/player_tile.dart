@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/player.dart';
+import '../../models/player.dart';
 
 /// Widget représentant un joueur dans une liste.
 class PlayerTile extends StatelessWidget {

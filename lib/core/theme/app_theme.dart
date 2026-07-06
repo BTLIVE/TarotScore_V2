@@ -1,36 +1,32 @@
 import 'package:flutter/material.dart';
 
+import 'app_colors.dart';
+
 class AppTheme {
-  AppTheme._();
+  const AppTheme._();
 
   static ThemeData get light {
-    return ThemeData(
+    final base = ThemeData(
       useMaterial3: true,
+      colorSchemeSeed: AppColors.primary,
+    );
 
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.green,
-        brightness: Brightness.light,
-      ),
-
-      scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+    return base.copyWith(
+      scaffoldBackgroundColor: AppColors.background,
 
       appBarTheme: const AppBarTheme(
         centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
 
-      cardTheme: CardThemeData(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+      cardTheme: const CardThemeData(
+        elevation: 1,
+        margin: EdgeInsets.zero,
       ),
 
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          minimumSize: const Size(160, 50),
-        ),
-      ),
+      dividerColor: AppColors.divider,
     );
   }
 }
