@@ -129,12 +129,11 @@ class RuleProfile {
     return null;
   }
 
-  /// Retourne le score minimum à atteindre
-  /// selon le nombre de bouts.
+  /// Retourne le score minimum à atteindre selon le nombre de bouts.
   ///
   /// Renvoie null si le nombre de bouts est invalide.
-  int? targetScore(int bouts) {
-    return targetScores[bouts];
+  int? targetScore(int oudlers) {
+    return targetScores[oudlers];
   }
 
   //---------------------------------------------------------------------------

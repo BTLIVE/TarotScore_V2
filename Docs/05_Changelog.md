@@ -33,3 +33,14 @@
 ### Qualité
 - Nettoyage du code
 - flutter analyze : aucune erreur
+
+
+## v2.0.0-alpha2
+### Added
+- Module Rules (modèles)
+- Official FFT profile
+- Deal / DealEvent
+- Architecture Rule Engine
+### Changed
+- Architecture feature-first
+- Session conçue comme journal d'événements

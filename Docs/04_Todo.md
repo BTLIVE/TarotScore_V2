@@ -241,3 +241,15 @@ Commit Git
 ↓
 
 Mise à jour de la documentation
+
+## Mise à jour v2.0.0-alpha2
+- [x] Modèles Rules (ContractRule, BonusRule, RuleProfile)
+- [x] Fabrique OfficialRuleProfiles
+- [x] Deal et DealEvent
+- [x] Architecture Rule Engine
+- [ ] ValidationCalculator
+- [ ] BaseScoreCalculator
+- [ ] ContractCalculator
+- [ ] BonusCalculator
+- [ ] DistributionCalculator
+- [ ] RuleEngine

@@ -11,12 +11,12 @@
 // Auteur : David
 // ***************************************************************************
 
-import 'deal_event.dart';
+import '../../rules/engine/models/deal_event.dart';
 
 class Deal {
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Identification
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   /// Identifiant unique permanent.
   final String uuid;
@@ -24,21 +24,31 @@ class Deal {
   /// Numéro de la manche dans la session.
   final int number;
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Participants
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   /// Position du preneur dans la session.
   final int attackerPosition;
 
+  /// Indique si le preneur joue avec un appelé.
+  ///
+  /// false :
+  /// - Partie à 4 joueurs.
+  /// - Partie à 5 joueurs où le preneur joue seul.
+  ///
+  /// true :
+  /// - Partie à 5 joueurs avec un appelé.
+  final bool hasCalledPartner;
+
   /// Position du partenaire (appelé).
   ///
-  /// Null si la partie se joue sans appelé.
+  /// Null si le preneur joue seul.
   final int? partnerPosition;
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Contrat
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   /// Identifiant du contrat.
   ///
@@ -57,21 +67,22 @@ class Deal {
   /// Nombre de points réalisés.
   final double points;
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Evènements
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   /// Evènements déclarés pendant la manche.
   final List<DealEvent> events;
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Constructeur
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   const Deal({
     required this.uuid,
     required this.number,
     required this.attackerPosition,
+    this.hasCalledPartner = false,
     this.partnerPosition,
     required this.contractId,
     required this.oudlers,
@@ -79,12 +90,12 @@ class Deal {
     this.events = const [],
   });
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Getters métier
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
-  /// Indique si un partenaire est présent.
-  bool get hasPartner => partnerPosition != null;
+  /// Le preneur joue seul.
+  bool get attackerAlone => !hasCalledPartner;
 
   /// Recherche un évènement.
   DealEvent? event(String id) {
@@ -102,14 +113,15 @@ class Deal {
     return event(id) != null;
   }
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Copy
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   Deal copyWith({
     String? uuid,
     int? number,
     int? attackerPosition,
+    bool? hasCalledPartner,
     int? partnerPosition,
     String? contractId,
     int? oudlers,
@@ -120,7 +132,10 @@ class Deal {
       uuid: uuid ?? this.uuid,
       number: number ?? this.number,
       attackerPosition: attackerPosition ?? this.attackerPosition,
-      partnerPosition: partnerPosition ?? this.partnerPosition,
+      hasCalledPartner:
+          hasCalledPartner ?? this.hasCalledPartner,
+      partnerPosition:
+          partnerPosition ?? this.partnerPosition,
       contractId: contractId ?? this.contractId,
       oudlers: oudlers ?? this.oudlers,
       points: points ?? this.points,
@@ -128,15 +143,17 @@ class Deal {
     );
   }
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Mapping
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   factory Deal.fromMap(Map<String, dynamic> map) {
     return Deal(
       uuid: map['uuid'] as String,
       number: map['number'] as int,
       attackerPosition: map['attacker_position'] as int,
+      hasCalledPartner:
+          (map['has_called_partner'] as int? ?? 0) == 1,
       partnerPosition: map['partner_position'] as int?,
       contractId: map['contract_id'] as String,
       oudlers: map['oudlers'] as int,
@@ -151,6 +168,7 @@ class Deal {
       'uuid': uuid,
       'number': number,
       'attacker_position': attackerPosition,
+      'has_called_partner': hasCalledPartner ? 1 : 0,
       'partner_position': partnerPosition,
       'contract_id': contractId,
       'oudlers': oudlers,
@@ -158,15 +176,16 @@ class Deal {
     };
   }
 
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Divers
-  //---------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
 
   @override
   String toString() {
     return 'Deal('
         'number: $number, '
         'contract: $contractId, '
+        'calledPartner: $hasCalledPartner, '
         'oudlers: $oudlers, '
         'points: $points'
         ')';
@@ -179,6 +198,7 @@ class Deal {
             other.uuid == uuid &&
             other.number == number &&
             other.attackerPosition == attackerPosition &&
+            other.hasCalledPartner == hasCalledPartner &&
             other.partnerPosition == partnerPosition &&
             other.contractId == contractId &&
             other.oudlers == oudlers &&
@@ -191,6 +211,7 @@ class Deal {
       uuid,
       number,
       attackerPosition,
+      hasCalledPartner,
       partnerPosition,
       contractId,
       oudlers,

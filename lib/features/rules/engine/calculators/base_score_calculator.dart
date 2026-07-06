@@ -3,25 +3,47 @@
 //
 // Fichier : base_score_calculator.dart
 //
-// Description : Calcul du score de base.
+// Description : Calcul du score de base d'une manche.
 //
 // Auteur : David
 // ***************************************************************************
 
-import '../value_objects/base_score.dart';
+import '../exceptions/invalid_deal_exception.dart';
+import '../pipeline/deal_calculation.dart';
+import 'calculator.dart';
 
-class BaseScoreCalculator {
+class BaseScoreCalculator implements Calculator {
   const BaseScoreCalculator();
 
-  BaseScore calculate({
-    required int targetScore,
-    required int pointsMade,
-  }) {
-    final difference = pointsMade - targetScore;
+  //--------------------------------------------------------------------------
+  // Calcul
+  //--------------------------------------------------------------------------
 
-    return BaseScore(
-      success: difference >= 0,
-      value: 25 + difference.abs(),
+  @override
+  DealCalculation calculate(
+    DealCalculation calculation,
+  ) {
+    final target = calculation.session.ruleProfile.targetScore(
+      calculation.deal.oudlers,
+    );
+
+    if (target == null) {
+      throw InvalidDealException(
+        'Impossible de déterminer le score cible.',
+      );
+    }
+
+    final difference =
+        calculation.deal.points - target;
+
+    final success = difference >= 0;
+
+    final baseScore =
+        25 + difference.abs().round();
+
+    return calculation.copyWith(
+      success: success,
+      baseScore: baseScore,
     );
   }
 }

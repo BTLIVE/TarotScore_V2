@@ -162,3 +162,5 @@ Les documents suivants ne changent que très rarement :
 Cette documentation a pour objectif de permettre la reprise du développement de TarotScore V2 à tout moment, sans dépendre de l'historique des conversations.
 
 Toute évolution importante du projet doit être documentée avant son implémentation.
+
+Mise à jour : v2.0.0-alpha2 - Domain Baseline.

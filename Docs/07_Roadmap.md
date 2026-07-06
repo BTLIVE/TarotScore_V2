@@ -305,3 +305,8 @@ Une phase est considérée comme terminée lorsque :
 - `flutter analyze` ne retourne aucune erreur.
 - La documentation est à jour.
 - Les modifications sont validées par un commit Git.
+
+## Prochaine étape
+1. Implémentation RuleEngine
+2. Persistance SQLite des profils
+3. Calcul complet des manches

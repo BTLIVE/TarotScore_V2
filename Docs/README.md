@@ -164,3 +164,5 @@ Avant chaque commit :
 # Licence
 
 Projet privé.
+
+Documentation mise à jour pour le jalon v2.0.0-alpha2.

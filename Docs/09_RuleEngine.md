@@ -254,3 +254,8 @@ Le moteur devra permettre :
 - profils de club
 
 Aucune évolution ne devra remettre en cause l'architecture du moteur.
+
+# Architecture validée
+Pipeline : Validation -> BaseScore -> Contract -> Bonus -> Distribution.
+Entrées : RuleProfile + Deal.
+Sortie : résultat de calcul temporaire.
