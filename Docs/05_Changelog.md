@@ -20,3 +20,16 @@
 - Catalogue des règles
 - UI/UX
 - Fonctionnalités
+
+## v2.0.0-alpha2 — 06/07/2026
+
+### Players
+- CRUD complet des joueurs
+- Validation des formulaires
+- Gestion des avatars
+- Import et affichage des photos
+- Architecture AvatarService / PhotoPickerService / PhotoStorageService
+
+### Qualité
+- Nettoyage du code
+- flutter analyze : aucune erreur

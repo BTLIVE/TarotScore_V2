@@ -32,7 +32,7 @@ Les versions correspondent à des jalons fonctionnels et non à des dates.
 
 ## Version actuelle
 
-v2.0.0-alpha1
+v2.0.0-alpha2
 
 Statut :
 
@@ -94,12 +94,18 @@ Objectifs :
 
 ## Joueurs
 
+Statut : ✅ Terminé
+
 - Création
 - Modification
-- Désactivation
-- Recherche
+- Activation / Désactivation
+- Validation
+- Gestion des avatars
+- Gestion des photos
 
 ## Profils de règles
+
+Statut : ▶ Prochaine étape
 
 - Création
 - Modification

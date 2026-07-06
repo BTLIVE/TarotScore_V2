@@ -5,7 +5,7 @@ Document : 04_Todo.md
 Version : 1.0
 Date de création : 05/07/2026
 Dernière mise à jour : 05/07/2026
-Statut : En cours
+Statut : ✅ Terminé
 Auteur : David & ChatGPT
 
 ---
@@ -60,11 +60,11 @@ Architecture
 
 Développement
 
-██░░░░░░░░ 20 %
+██████░░░░ 60 %
 
 Tests
 
-░░░░░░░░░░ 0 %
+██░░░░░░░░ 20 %
 
 ---
 
@@ -88,15 +88,22 @@ Statut : En cours
 - [x] Écran Liste
 - [x] Formulaire
 
-### À terminer
+### Fonctionnalités réalisées
 
-- [ ] Navigation Liste → Formulaire
-- [ ] Création d'un joueur
-- [ ] Modification
-- [ ] Désactivation
-- [ ] Réactivation
+- [x] Navigation Liste → Formulaire
+- [x] Création d'un joueur
+- [x] Modification
+- [x] Activation / Désactivation
+- [x] Validation des données
+- [x] Gestion des avatars
+- [x] Gestion des photos
+
+### Améliorations futures
+
 - [ ] Recherche
-- [ ] Validation des données
+- [ ] Compression automatique des photos
+- [ ] Suppression automatique de l'ancienne photo
+- [ ] Suppression d'une photo
 
 ---
 
