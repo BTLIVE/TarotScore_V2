@@ -2,9 +2,9 @@
 //
 // TarotScore V2
 //
-// Fichier : session_table.dart
+// Fichier : deal_table.dart
 //
-// Description : Table des sessions.
+// Description : Table des donnes.
 //
 // Auteur : David
 //
@@ -12,43 +12,54 @@
 
 import 'package:sqflite/sqflite.dart';
 
-class SessionTable {
-  SessionTable._();
+class DealTable {
+  DealTable._();
 
   //--------------------------------------------------------------------------
   // Table
   //--------------------------------------------------------------------------
 
-  static const tableName =
-      'sessions';
+  static const tableName = 'deals';
 
   //--------------------------------------------------------------------------
   // Colonnes
   //--------------------------------------------------------------------------
 
+  /// Clé technique SQLite.
   static const id = 'id';
 
+  /// UUID métier.
   static const uuid = 'uuid';
 
-  static const ruleProfileUuid =
-      'rule_profile_uuid';
+  /// Session propriétaire.
+  static const sessionUuid = 'session_uuid';
 
-  static const startedAt =
-      'started_at';
+  /// Numéro de la donne.
+  static const number = 'number';
 
-  static const finishedAt =
-      'finished_at';
+  /// Position du donneur.
+  static const dealerPosition =
+      'dealer_position';
 
-  /// 0 = en cours
-  /// 1 = terminée
-  /// 2 = archivée
-  static const status = 'status';
+  /// Position du preneur.
+  static const attackerPosition =
+      'attacker_position';
 
-  static const playerCount =
-      'player_count';
+  /// Position du partenaire (nullable).
+  static const partnerPosition =
+      'partner_position';
 
-  static const firstDealerPosition =
-      'first_dealer_position';
+  /// Contrat joué.
+  static const contractId =
+      'contract_id';
+
+  /// Nombre de bouts.
+  static const oudlers =
+      'oudlers';
+
+  /// Points réalisés.
+  static const points =
+      'points';
 
   //--------------------------------------------------------------------------
   // Création
@@ -64,17 +75,21 @@ $id INTEGER PRIMARY KEY AUTOINCREMENT,
 
 $uuid TEXT NOT NULL UNIQUE,
 
-$ruleProfileUuid TEXT NOT NULL,
+$sessionUuid TEXT NOT NULL,
 
-$startedAt TEXT NOT NULL,
+$number INTEGER NOT NULL,
 
-$finishedAt TEXT,
+$dealerPosition INTEGER NOT NULL,
 
-$status INTEGER NOT NULL,
+$attackerPosition INTEGER NOT NULL,
 
-$playerCount INTEGER NOT NULL,
+$partnerPosition INTEGER,
 
-$firstDealerPosition INTEGER NOT NULL
+$contractId TEXT NOT NULL,
+
+$oudlers INTEGER NOT NULL,
+
+$points REAL NOT NULL
 
 )
 ''');
@@ -84,13 +99,16 @@ $firstDealerPosition INTEGER NOT NULL
     //----------------------------------------------------------------------
 
     await db.execute('''
-CREATE INDEX idx_sessions_uuid
-ON $tableName($uuid)
+CREATE INDEX idx_deals_session
+ON $tableName($sessionUuid)
 ''');
 
     await db.execute('''
-CREATE INDEX idx_sessions_status
-ON $tableName($status)
+CREATE UNIQUE INDEX idx_deals_number
+ON $tableName(
+    $sessionUuid,
+    $number
+)
 ''');
   }
 }

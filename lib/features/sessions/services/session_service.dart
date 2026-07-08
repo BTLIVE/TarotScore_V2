@@ -18,6 +18,7 @@ import '../../rules/models/rule_profile.dart';
 import '../models/player_score.dart';
 import '../models/session.dart';
 import '../models/session_state.dart';
+import '../repositories/session_repository.dart';
 
 class SessionService {
   SessionService._();
@@ -26,6 +27,10 @@ class SessionService {
       SessionService._();
 
   static const Uuid _uuid = Uuid();
+
+  static final SessionRepository
+      _repository =
+      SessionRepository.instance;
 
   //--------------------------------------------------------------------------
   // Session courante
@@ -74,9 +79,17 @@ class SessionService {
 
     return Session(
       uuid: _uuid.v4(),
+
+      startedAt: DateTime.now(),
+
+      finishedAt: null,
+
       ruleProfile: ruleProfile,
+
       players: List.unmodifiable(players),
-      firstDealerPosition: firstDealerPosition,
+
+      firstDealerPosition:
+          firstDealerPosition,
     );
   }
 
@@ -92,7 +105,8 @@ class SessionService {
     final session = create(
       ruleProfile: ruleProfile,
       players: players,
-      firstDealerPosition: firstDealerPosition,
+      firstDealerPosition:
+          firstDealerPosition,
     );
 
     final playerScores = List.generate(
@@ -100,13 +114,62 @@ class SessionService {
       (index) => PlayerScore(
         playerPosition: index,
       ),
+      growable: false,
     );
+
+    //----------------------------------------------------------------------
+    // Calcul des joueurs morts
+    //----------------------------------------------------------------------
+
+    final List<int> deadPlayerPositions;
+
+    switch (players.length) {
+      case 6:
+        deadPlayerPositions = [
+          firstDealerPosition,
+        ];
+        break;
+
+      case 7:
+        deadPlayerPositions = [
+          (firstDealerPosition -
+                  1 +
+                  players.length) %
+              players.length,
+          firstDealerPosition,
+        ];
+        break;
+
+      default:
+        deadPlayerPositions = const [];
+    }
+
+    //----------------------------------------------------------------------
+    // Calcul des joueurs actifs
+    //----------------------------------------------------------------------
+
+    final activePlayerPositions =
+        List.generate(
+      players.length,
+      (index) => index,
+    )
+            .where(
+              (index) =>
+                  !deadPlayerPositions
+                      .contains(index),
+            )
+            .toList(growable: false);
 
     _currentSession = SessionState(
       session: session,
       playerScores: playerScores,
+      activePlayerPositions:
+          activePlayerPositions,
+      deadPlayerPositions:
+          deadPlayerPositions,
       nextDealNumber: 1,
-      nextDealerPosition: firstDealerPosition,
+      nextDealerPosition:
+          firstDealerPosition,
     );
 
     return _currentSession!;
@@ -129,15 +192,46 @@ class SessionService {
   }
 
   //--------------------------------------------------------------------------
+  // Persistance
+  //--------------------------------------------------------------------------
+
+  /// Sauvegarde la session courante.
+  Future<void> saveCurrentSession() async {
+    final state = requireCurrentSession();
+
+    await _repository.save(
+      state.session,
+    );
+
+    await _repository.savePlayerScores(
+      sessionUuid: state.session.uuid,
+      players: state.session.players,
+      playerScores: state.playerScores,
+    );
+  }
+
+  /// Sauvegarde puis ferme la session.
+  Future<void> closeAndSaveCurrentSession() async {
+    if (!hasCurrentSession) {
+      return;
+    }
+
+    await saveCurrentSession();
+
+    _currentSession = null;
+  }
+
+  //--------------------------------------------------------------------------
   // Validation
   //--------------------------------------------------------------------------
 
   void _validatePlayers(
     List<Player> players,
   ) {
-    if (players.length < 3 || players.length > 5) {
+    if (players.length < 3 ||
+        players.length > 7) {
       throw ArgumentError(
-        'Une session doit comporter entre 3 et 5 joueurs.',
+        'Une session doit comporter entre 3 et 7 joueurs.',
       );
     }
 

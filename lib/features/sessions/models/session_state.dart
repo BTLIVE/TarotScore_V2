@@ -1,4 +1,5 @@
 // ***************************************************************************
+//
 // TarotScore V2
 //
 // Fichier : session_state.dart
@@ -9,7 +10,10 @@
 // Elle est reconstruite après chaque calcul.
 //
 // Auteur : David
+//
 // ***************************************************************************
+
+import '../../players/models/player.dart';
 
 import 'deal.dart';
 import 'player_score.dart';
@@ -31,6 +35,16 @@ class SessionState {
   final List<PlayerScore> playerScores;
 
   //--------------------------------------------------------------------------
+  // Joueurs actifs
+  //--------------------------------------------------------------------------
+
+  /// Positions des joueurs participant à la prochaine donne.
+  final List<int> activePlayerPositions;
+
+  /// Positions des joueurs "Morts".
+  final List<int> deadPlayerPositions;
+
+  //--------------------------------------------------------------------------
   // Etat courant
   //--------------------------------------------------------------------------
 
@@ -47,6 +61,8 @@ class SessionState {
   const SessionState({
     required this.session,
     required this.playerScores,
+    this.activePlayerPositions = const [],
+    this.deadPlayerPositions = const [],
     required this.nextDealNumber,
     required this.nextDealerPosition,
   });
@@ -59,6 +75,45 @@ class SessionState {
 
   Deal? get lastDeal => session.lastDeal;
 
+  /// Nombre de joueurs de la soirée.
+  int get playerCount => session.playerCount;
+
+  /// Nombre de joueurs actifs.
+  int get activePlayerCount =>
+      activePlayerPositions.length;
+
+  /// Joueurs actifs.
+  List<Player> get activePlayers {
+    return activePlayerPositions
+        .map(
+          (position) =>
+              session.players[position],
+        )
+        .toList(growable: false);
+  }
+
+  /// Joueurs morts.
+  List<Player> get deadPlayers {
+    return deadPlayerPositions
+        .map(
+          (position) =>
+              session.players[position],
+        )
+        .toList(growable: false);
+  }
+
+  bool isActive(int position) {
+    return activePlayerPositions.contains(
+      position,
+    );
+  }
+
+  bool isDead(int position) {
+    return deadPlayerPositions.contains(
+      position,
+    );
+  }
+
   //--------------------------------------------------------------------------
   // Copy
   //--------------------------------------------------------------------------
@@ -66,15 +121,27 @@ class SessionState {
   SessionState copyWith({
     Session? session,
     List<PlayerScore>? playerScores,
+    List<int>? activePlayerPositions,
+    List<int>? deadPlayerPositions,
     int? nextDealNumber,
     int? nextDealerPosition,
   }) {
     return SessionState(
       session: session ?? this.session,
-      playerScores: playerScores ?? this.playerScores,
-      nextDealNumber: nextDealNumber ?? this.nextDealNumber,
+      playerScores:
+          playerScores ?? this.playerScores,
+      activePlayerPositions:
+          activePlayerPositions ??
+              this.activePlayerPositions,
+      deadPlayerPositions:
+          deadPlayerPositions ??
+              this.deadPlayerPositions,
+      nextDealNumber:
+          nextDealNumber ??
+              this.nextDealNumber,
       nextDealerPosition:
-          nextDealerPosition ?? this.nextDealerPosition,
+          nextDealerPosition ??
+              this.nextDealerPosition,
     );
   }
 
@@ -86,7 +153,9 @@ class SessionState {
   String toString() {
     return 'SessionState('
         'deal: $nextDealNumber, '
-        'dealer: $nextDealerPosition'
+        'dealer: $nextDealerPosition, '
+        'active: ${activePlayerPositions.length}, '
+        'dead: ${deadPlayerPositions.length}'
         ')';
   }
 
@@ -95,17 +164,27 @@ class SessionState {
     return identical(this, other) ||
         other is SessionState &&
             other.session == session &&
-            other.playerScores == playerScores &&
-            other.nextDealNumber == nextDealNumber &&
+            other.playerScores ==
+                playerScores &&
+            other.activePlayerPositions ==
+                activePlayerPositions &&
+            other.deadPlayerPositions ==
+                deadPlayerPositions &&
+            other.nextDealNumber ==
+                nextDealNumber &&
             other.nextDealerPosition ==
                 nextDealerPosition;
   }
 
   @override
-  int get hashCode => Object.hash(
-        session,
-        playerScores,
-        nextDealNumber,
-        nextDealerPosition,
-      );
+  int get hashCode {
+    return Object.hash(
+      session,
+      playerScores,
+      activePlayerPositions,
+      deadPlayerPositions,
+      nextDealNumber,
+      nextDealerPosition,
+    );
+  }
 }

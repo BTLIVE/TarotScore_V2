@@ -23,6 +23,14 @@ class Session {
   /// Identifiant unique permanent.
   final String uuid;
 
+  /// Date de création de la session.
+  final DateTime startedAt;
+
+  /// Date de fin de la session.
+  ///
+  /// Null tant que la partie est en cours.
+  final DateTime? finishedAt;
+
   //--------------------------------------------------------------------------
   // Règles
   //--------------------------------------------------------------------------
@@ -53,6 +61,8 @@ class Session {
 
   const Session({
     required this.uuid,
+    required this.startedAt,
+    this.finishedAt,
     required this.ruleProfile,
     required this.players,
     required this.firstDealerPosition,
@@ -75,12 +85,20 @@ class Session {
 
   Deal? get lastDeal => hasDeals ? deals.last : null;
 
+  /// Partie terminée.
+  bool get isFinished => finishedAt != null;
+
+  /// Partie en cours.
+  bool get isInProgress => !isFinished;
+
   //--------------------------------------------------------------------------
   // Copy
   //--------------------------------------------------------------------------
 
   Session copyWith({
     String? uuid,
+    DateTime? startedAt,
+    DateTime? finishedAt,
     RuleProfile? ruleProfile,
     List<Player>? players,
     int? firstDealerPosition,
@@ -88,10 +106,13 @@ class Session {
   }) {
     return Session(
       uuid: uuid ?? this.uuid,
+      startedAt: startedAt ?? this.startedAt,
+      finishedAt: finishedAt ?? this.finishedAt,
       ruleProfile: ruleProfile ?? this.ruleProfile,
       players: players ?? this.players,
       firstDealerPosition:
-          firstDealerPosition ?? this.firstDealerPosition,
+          firstDealerPosition ??
+              this.firstDealerPosition,
       deals: deals ?? this.deals,
     );
   }
@@ -114,6 +135,8 @@ class Session {
     return identical(this, other) ||
         other is Session &&
             other.uuid == uuid &&
+            other.startedAt == startedAt &&
+            other.finishedAt == finishedAt &&
             other.ruleProfile == ruleProfile &&
             other.firstDealerPosition ==
                 firstDealerPosition;
@@ -122,6 +145,8 @@ class Session {
   @override
   int get hashCode => Object.hash(
         uuid,
+        startedAt,
+        finishedAt,
         ruleProfile,
         firstDealerPosition,
       );

@@ -2,9 +2,9 @@
 //
 // TarotScore V2
 //
-// Fichier : session_table.dart
+// Fichier : deal_event_table.dart
 //
-// Description : Table des sessions.
+// Description : Table des événements d'une donne.
 //
 // Auteur : David
 //
@@ -12,43 +12,30 @@
 
 import 'package:sqflite/sqflite.dart';
 
-class SessionTable {
-  SessionTable._();
+class DealEventTable {
+  DealEventTable._();
 
   //--------------------------------------------------------------------------
   // Table
   //--------------------------------------------------------------------------
 
   static const tableName =
-      'sessions';
+      'deal_events';
 
   //--------------------------------------------------------------------------
   // Colonnes
   //--------------------------------------------------------------------------
 
+  /// Clé technique SQLite.
   static const id = 'id';
 
-  static const uuid = 'uuid';
+  /// UUID de la donne.
+  static const dealUuid =
+      'deal_uuid';
 
-  static const ruleProfileUuid =
-      'rule_profile_uuid';
-
-  static const startedAt =
-      'started_at';
-
-  static const finishedAt =
-      'finished_at';
-
-  /// 0 = en cours
-  /// 1 = terminée
-  /// 2 = archivée
-  static const status = 'status';
-
-  static const playerCount =
-      'player_count';
-
-  static const firstDealerPosition =
-      'first_dealer_position';
+  /// Identifiant de l'événement.
+  static const eventId =
+      'event_id';
 
   //--------------------------------------------------------------------------
   // Création
@@ -62,19 +49,9 @@ CREATE TABLE $tableName (
 
 $id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-$uuid TEXT NOT NULL UNIQUE,
+$dealUuid TEXT NOT NULL,
 
-$ruleProfileUuid TEXT NOT NULL,
-
-$startedAt TEXT NOT NULL,
-
-$finishedAt TEXT,
-
-$status INTEGER NOT NULL,
-
-$playerCount INTEGER NOT NULL,
-
-$firstDealerPosition INTEGER NOT NULL
+$eventId TEXT NOT NULL
 
 )
 ''');
@@ -84,13 +61,16 @@ $firstDealerPosition INTEGER NOT NULL
     //----------------------------------------------------------------------
 
     await db.execute('''
-CREATE INDEX idx_sessions_uuid
-ON $tableName($uuid)
+CREATE INDEX idx_deal_events_deal
+ON $tableName($dealUuid)
 ''');
 
     await db.execute('''
-CREATE INDEX idx_sessions_status
-ON $tableName($status)
+CREATE UNIQUE INDEX idx_deal_events_unique
+ON $tableName(
+    $dealUuid,
+    $eventId
+)
 ''');
   }
 }

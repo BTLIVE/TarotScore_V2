@@ -2,9 +2,9 @@
 //
 // TarotScore V2
 //
-// Fichier : session_table.dart
+// Fichier : session_player_table.dart
 //
-// Description : Table des sessions.
+// Description : Table des joueurs d'une session.
 //
 // Auteur : David
 //
@@ -12,43 +12,39 @@
 
 import 'package:sqflite/sqflite.dart';
 
-class SessionTable {
-  SessionTable._();
+class SessionPlayerTable {
+  SessionPlayerTable._();
 
   //--------------------------------------------------------------------------
   // Table
   //--------------------------------------------------------------------------
 
-  static const tableName =
-      'sessions';
+  static const tableName = 'session_players';
 
   //--------------------------------------------------------------------------
   // Colonnes
   //--------------------------------------------------------------------------
 
+  /// Clé technique SQLite.
   static const id = 'id';
 
-  static const uuid = 'uuid';
+  /// UUID de la session.
+  static const sessionUuid = 'session_uuid';
 
-  static const ruleProfileUuid =
-      'rule_profile_uuid';
+  /// UUID du joueur.
+  static const playerUuid = 'player_uuid';
 
-  static const startedAt =
-      'started_at';
+  /// Position du joueur autour de la table.
+  static const playerPosition =
+      'player_position';
 
-  static const finishedAt =
-      'finished_at';
-
-  /// 0 = en cours
-  /// 1 = terminée
-  /// 2 = archivée
-  static const status = 'status';
-
-  static const playerCount =
-      'player_count';
-
-  static const firstDealerPosition =
-      'first_dealer_position';
+  /// Score final du joueur.
+  ///
+  /// Ce score est figé lors de la sauvegarde
+  /// de la session et servira directement
+  /// aux statistiques.
+  static const finalScore =
+      'final_score';
 
   //--------------------------------------------------------------------------
   // Création
@@ -62,19 +58,13 @@ CREATE TABLE $tableName (
 
 $id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-$uuid TEXT NOT NULL UNIQUE,
+$sessionUuid TEXT NOT NULL,
 
-$ruleProfileUuid TEXT NOT NULL,
+$playerUuid TEXT NOT NULL,
 
-$startedAt TEXT NOT NULL,
+$playerPosition INTEGER NOT NULL,
 
-$finishedAt TEXT,
-
-$status INTEGER NOT NULL,
-
-$playerCount INTEGER NOT NULL,
-
-$firstDealerPosition INTEGER NOT NULL
+$finalScore INTEGER NOT NULL DEFAULT 0
 
 )
 ''');
@@ -84,13 +74,29 @@ $firstDealerPosition INTEGER NOT NULL
     //----------------------------------------------------------------------
 
     await db.execute('''
-CREATE INDEX idx_sessions_uuid
-ON $tableName($uuid)
+CREATE INDEX idx_session_players_session
+ON $tableName($sessionUuid)
 ''');
 
     await db.execute('''
-CREATE INDEX idx_sessions_status
-ON $tableName($status)
+CREATE INDEX idx_session_players_player
+ON $tableName($playerUuid)
+''');
+
+    await db.execute('''
+CREATE UNIQUE INDEX idx_session_players_position
+ON $tableName(
+    $sessionUuid,
+    $playerPosition
+)
+''');
+
+    await db.execute('''
+CREATE UNIQUE INDEX idx_session_players_player_unique
+ON $tableName(
+    $sessionUuid,
+    $playerUuid
+)
 ''');
   }
 }

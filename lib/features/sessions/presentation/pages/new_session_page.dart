@@ -20,7 +20,6 @@ import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_section.dart';
 
 import '../../../players/services/player_service.dart';
-
 import '../../../rules/factories/official_rule_profiles.dart';
 
 import '../../models/session_player.dart';
@@ -90,8 +89,15 @@ class _NewSessionPageState
     setState(() {});
   }
 
+  //--------------------------------------------------------------------------
+  // Création de la session
+  //--------------------------------------------------------------------------
+
   Future<void> _startSession() async {
+    debugPrint('=== START SESSION ===');
+
     if (_dealer == null) {
+      debugPrint('Aucun donneur sélectionné.');
       return;
     }
 
@@ -100,21 +106,51 @@ class _NewSessionPageState
         .toList();
 
     final dealerPosition =
-        selectedPlayers.indexOf(_dealer!);
-
-    _sessionService.start(
-      ruleProfile:
-          OfficialRuleProfiles.fft(),
-      players: selectedPlayers
-          .map((p) => p.player)
-          .toList(),
-      firstDealerPosition:
-          dealerPosition,
+        selectedPlayers.indexWhere(
+      (player) =>
+          player.player.uuid ==
+          _dealer!.player.uuid,
     );
+
+    debugPrint(
+      'Joueurs sélectionnés : ${selectedPlayers.length}',
+    );
+
+    debugPrint(
+      'Position donneur : $dealerPosition',
+    );
+
+    try {
+      _sessionService.start(
+        ruleProfile:
+            OfficialRuleProfiles.fft(),
+        players: selectedPlayers
+            .map((p) => p.player)
+            .toList(),
+        firstDealerPosition:
+            dealerPosition,
+      );
+
+      debugPrint(
+        'Session créée avec succès.',
+      );
+    } catch (e, stackTrace) {
+      debugPrint(
+        'Erreur SessionService.start()',
+      );
+      debugPrint(e.toString());
+      debugPrint(stackTrace.toString());
+
+      return;
+    }
 
     if (!mounted) {
       return;
     }
+
+    debugPrint(
+      'Navigation vers CurrentSession.',
+    );
 
     Navigator.pushReplacementNamed(
       context,
@@ -150,7 +186,6 @@ class _NewSessionPageState
                     ),
                   ),
                 ),
-
                 AppSection(
                   title: 'Joueurs',
                   child: PlayerSelectionCard(
@@ -158,7 +193,6 @@ class _NewSessionPageState
                     onChanged: _refresh,
                   ),
                 ),
-
                 AppSection(
                   title: 'Premier donneur',
                   child: DealerSelectionCard(
@@ -172,11 +206,9 @@ class _NewSessionPageState
                     },
                   ),
                 ),
-
                 const SizedBox(
                   height: AppSpacing.xl,
                 ),
-
                 AppButton(
                   label:
                       'Créer la partie',

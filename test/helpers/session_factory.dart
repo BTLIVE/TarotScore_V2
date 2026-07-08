@@ -13,6 +13,7 @@ class SessionFactory {
   }) {
     return Session(
       uuid: const Uuid().v4(),
+      startedAt: DateTime.now(),
       ruleProfile: RuleProfileFactory.fft(),
       players: PlayerFactory.threePlayers(),
       firstDealerPosition: firstDealerPosition,
@@ -24,6 +25,7 @@ class SessionFactory {
   }) {
     return Session(
       uuid: const Uuid().v4(),
+      startedAt: DateTime.now(),
       ruleProfile: RuleProfileFactory.fft(),
       players: PlayerFactory.fourPlayers(),
       firstDealerPosition: firstDealerPosition,
@@ -35,6 +37,7 @@ class SessionFactory {
   }) {
     return Session(
       uuid: const Uuid().v4(),
+      startedAt: DateTime.now(),
       ruleProfile: RuleProfileFactory.fft(),
       players: PlayerFactory.fivePlayers(),
       firstDealerPosition: firstDealerPosition,

@@ -2,7 +2,7 @@
 //
 // TarotScore V2
 //
-// Fichier : session_state_service.dart
+// Fichier : session_state_builder.dart
 //
 // Description : Construction de l'état courant d'une session.
 //
@@ -10,130 +10,76 @@
 //
 // ***************************************************************************
 
-import '../../rules/engine/rule_engine.dart';
 import '../models/player_score.dart';
 import '../models/session.dart';
 import '../models/session_state.dart';
-import 'dealer_service.dart';
 
-class SessionStateService {
-  //--------------------------------------------------------------------------
-  // Dépendances
-  //--------------------------------------------------------------------------
+class SessionStateBuilder {
+  SessionStateBuilder._();
 
-  final RuleEngine ruleEngine;
-
-  final DealerService dealerService;
-
-  const SessionStateService({
-    required this.ruleEngine,
-    required this.dealerService,
-  });
+  static final SessionStateBuilder instance =
+      SessionStateBuilder._();
 
   //--------------------------------------------------------------------------
   // Construction
   //--------------------------------------------------------------------------
 
-  SessionState createState({
+  SessionState build({
     required Session session,
   }) {
+    final playerScores = List.generate(
+      session.playerCount,
+      (index) => PlayerScore(
+        playerPosition: index,
+      ),
+    );
+
     final nextDealerPosition =
-        dealerService.currentDealer(session);
+        _nextDealerPosition(session);
 
     final deadPlayerPositions =
-        _deadPlayers(
+        _calculateDeadPlayers(
       session,
       nextDealerPosition,
     );
 
     final activePlayerPositions =
-        _activePlayers(
+        _calculateActivePlayers(
       session,
       deadPlayerPositions,
     );
 
     return SessionState(
       session: session,
-
-      playerScores: _computeScores(
-        session,
-        activePlayerPositions.length,
-      ),
-
+      playerScores: playerScores,
       activePlayerPositions:
           activePlayerPositions,
-
       deadPlayerPositions:
           deadPlayerPositions,
-
       nextDealNumber:
           session.deals.length + 1,
-
       nextDealerPosition:
           nextDealerPosition,
     );
   }
 
   //--------------------------------------------------------------------------
-  // Calcul des scores
+  // Calcul du prochain donneur
   //--------------------------------------------------------------------------
 
-  List<PlayerScore> _computeScores(
+  int _nextDealerPosition(
     Session session,
-    int activePlayerCount,
   ) {
-    final scores = List.generate(
-      session.playerCount,
-      (index) => PlayerScore(
-        playerPosition: index,
-      ),
-      growable: false,
-    );
-
-    for (final deal in session.deals) {
-      final calculation =
-          ruleEngine.calculate(
-        profile: session.ruleProfile,
-
-        // Nombre de joueurs de la donne
-        // (3 à 5), et non de la session.
-        playerCount:
-            activePlayerCount,
-
-        deal: deal,
-      );
-
-      final dealScores =
-          calculation.playerScores;
-
-      if (dealScores == null) {
-        throw StateError(
-          'Le RuleEngine n\'a produit aucun score.',
-        );
-      }
-
-      for (final entry
-          in dealScores.entries) {
-        final current =
-            scores[entry.key];
-
-        scores[entry.key] =
-            current.copyWith(
-          totalScore:
-              current.totalScore +
-                  entry.value,
-        );
-      }
-    }
-
-    return List.unmodifiable(scores);
+    return (session.firstDealerPosition +
+            session.deals.length) %
+        session.playerCount;
   }
 
   //--------------------------------------------------------------------------
-  // Joueurs morts
+  // Calcul des morts
   //--------------------------------------------------------------------------
 
-  List<int> _deadPlayers(
+  List<int> _calculateDeadPlayers(
     Session session,
     int dealerPosition,
   ) {
@@ -146,9 +92,9 @@ class SessionStateService {
       case 7:
         return [
           (dealerPosition -
-                      1 +
-                      session.playerCount) %
-                  session.playerCount,
+                  1 +
+                  session.playerCount) %
+              session.playerCount,
           dealerPosition,
         ];
 
@@ -158,10 +104,10 @@ class SessionStateService {
   }
 
   //--------------------------------------------------------------------------
-  // Joueurs actifs
+  // Calcul des joueurs actifs
   //--------------------------------------------------------------------------
 
-  List<int> _activePlayers(
+  List<int> _calculateActivePlayers(
     Session session,
     List<int> deadPlayers,
   ) {
