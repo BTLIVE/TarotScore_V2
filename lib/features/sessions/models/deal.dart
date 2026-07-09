@@ -131,15 +131,23 @@ class Deal {
     return Deal(
       uuid: uuid ?? this.uuid,
       number: number ?? this.number,
-      attackerPosition: attackerPosition ?? this.attackerPosition,
+      attackerPosition:
+          attackerPosition ??
+              this.attackerPosition,
       hasCalledPartner:
-          hasCalledPartner ?? this.hasCalledPartner,
+          hasCalledPartner ??
+              this.hasCalledPartner,
       partnerPosition:
-          partnerPosition ?? this.partnerPosition,
-      contractId: contractId ?? this.contractId,
-      oudlers: oudlers ?? this.oudlers,
-      points: points ?? this.points,
-      events: events ?? this.events,
+          partnerPosition ??
+              this.partnerPosition,
+      contractId:
+          contractId ?? this.contractId,
+      oudlers:
+          oudlers ?? this.oudlers,
+      points:
+          points ?? this.points,
+      events:
+          events ?? this.events,
     );
   }
 
@@ -147,18 +155,38 @@ class Deal {
   // Mapping
   //--------------------------------------------------------------------------
 
-  factory Deal.fromMap(Map<String, dynamic> map) {
+  factory Deal.fromMap(
+    Map<String, dynamic> map,
+  ) {
+    final partnerPosition =
+        map['partner_position'] as int?;
+
     return Deal(
       uuid: map['uuid'] as String,
+
       number: map['number'] as int,
-      attackerPosition: map['attacker_position'] as int,
+
+      attackerPosition:
+          map['attacker_position'] as int,
+
       hasCalledPartner:
-          (map['has_called_partner'] as int? ?? 0) == 1,
-      partnerPosition: map['partner_position'] as int?,
-      contractId: map['contract_id'] as String,
-      oudlers: map['oudlers'] as int,
-      points: (map['points'] as num).toDouble(),
-      // Les évènements seront chargés séparément par le repository.
+          partnerPosition != null,
+
+      partnerPosition:
+          partnerPosition,
+
+      contractId:
+          map['contract_id'] as String,
+
+      oudlers:
+          map['oudlers'] as int,
+
+      points:
+          (map['points'] as num)
+              .toDouble(),
+
+      // Les évènements seront chargés
+      // séparément par le repository.
       events: const [],
     );
   }
@@ -167,12 +195,18 @@ class Deal {
     return {
       'uuid': uuid,
       'number': number,
-      'attacker_position': attackerPosition,
-      'has_called_partner': hasCalledPartner ? 1 : 0,
-      'partner_position': partnerPosition,
-      'contract_id': contractId,
-      'oudlers': oudlers,
-      'points': points,
+      'attacker_position':
+          attackerPosition,
+      'has_called_partner':
+          hasCalledPartner ? 1 : 0,
+      'partner_position':
+          partnerPosition,
+      'contract_id':
+          contractId,
+      'oudlers':
+          oudlers,
+      'points':
+          points,
     };
   }
 
@@ -192,17 +226,25 @@ class Deal {
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(
+    Object other,
+  ) {
     return identical(this, other) ||
         other is Deal &&
             other.uuid == uuid &&
             other.number == number &&
-            other.attackerPosition == attackerPosition &&
-            other.hasCalledPartner == hasCalledPartner &&
-            other.partnerPosition == partnerPosition &&
-            other.contractId == contractId &&
-            other.oudlers == oudlers &&
-            other.points == points;
+            other.attackerPosition ==
+                attackerPosition &&
+            other.hasCalledPartner ==
+                hasCalledPartner &&
+            other.partnerPosition ==
+                partnerPosition &&
+            other.contractId ==
+                contractId &&
+            other.oudlers ==
+                oudlers &&
+            other.points ==
+                points;
   }
 
   @override

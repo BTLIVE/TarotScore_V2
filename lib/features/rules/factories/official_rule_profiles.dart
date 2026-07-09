@@ -8,8 +8,6 @@
 // Auteur : David
 // ***************************************************************************
 
-import 'package:uuid/uuid.dart';
-
 import '../models/bonus_rule.dart';
 import '../models/contract_rule.dart';
 import '../models/rule_profile.dart';
@@ -17,15 +15,34 @@ import '../models/rule_profile.dart';
 class OfficialRuleProfiles {
   OfficialRuleProfiles._();
 
-  static final Uuid _uuid = const Uuid();
+  //--------------------------------------------------------------------------
+  // Identifiants permanents
+  //--------------------------------------------------------------------------
+
+  static const String fftUuid =
+      'fft-officielle-2025';
+
+  //--------------------------------------------------------------------------
+  // Liste des profils officiels
+  //--------------------------------------------------------------------------
+
+  static final List<RuleProfile> all = [
+    _createFft(),
+  ];
+
+  //--------------------------------------------------------------------------
+  // Accès direct
+  //--------------------------------------------------------------------------
+
+  static RuleProfile fft() => all.first;
 
   //--------------------------------------------------------------------------
   // FFT officielle
   //--------------------------------------------------------------------------
 
-  static RuleProfile fft() {
+  static RuleProfile _createFft() {
     return RuleProfile(
-      uuid: _uuid.v4(),
+      uuid: fftUuid,
 
       name: 'FFT Officielle',
 
