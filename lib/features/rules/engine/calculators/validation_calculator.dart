@@ -1,4 +1,5 @@
 // ***************************************************************************
+//
 // TarotScore V2
 //
 // Fichier : validation_calculator.dart
@@ -6,6 +7,7 @@
 // Description : Validation des données d'une manche avant calcul.
 //
 // Auteur : David
+//
 // ***************************************************************************
 
 import '../../../sessions/models/deal.dart';
@@ -43,6 +45,11 @@ class ValidationCalculator implements Calculator {
     );
 
     _validatePoints(
+      deal,
+    );
+
+    _validateBonuses(
+      profile,
       deal,
     );
 
@@ -151,6 +158,46 @@ class ValidationCalculator implements Calculator {
     if (deal.points < 0 || deal.points > 91) {
       throw InvalidDealException(
         'Le nombre de points doit être compris entre 0 et 91.',
+      );
+    }
+  }
+
+  //--------------------------------------------------------------------------
+  // Bonus
+  //--------------------------------------------------------------------------
+
+  void _validateBonuses(
+    RuleProfile profile,
+    Deal deal,
+  ) {
+    _validateSingleBonusType(
+      profile: profile,
+      deal: deal,
+      typeId: 'poignee',
+      message:
+          'Une seule poignée peut être déclarée.',
+    );
+  }
+
+  //--------------------------------------------------------------------------
+
+  void _validateSingleBonusType({
+    required RuleProfile profile,
+    required Deal deal,
+    required String typeId,
+    required String message,
+  }) {
+    final count = deal.events.where((event) {
+      final rule = profile.bonus(
+        event.id,
+      );
+
+      return rule?.typeId == typeId;
+    }).length;
+
+    if (count > 1) {
+      throw InvalidDealException(
+        message,
       );
     }
   }

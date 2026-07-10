@@ -10,10 +10,13 @@
 //
 // ***************************************************************************
 
+import '../../rules/engine/pipeline/deal_context.dart';
 import '../../rules/engine/rule_engine.dart';
+
 import '../models/player_score.dart';
 import '../models/session.dart';
 import '../models/session_state.dart';
+
 import 'dealer_service.dart';
 
 class SessionStateService {
@@ -57,7 +60,6 @@ class SessionStateService {
 
       playerScores: _computeScores(
         session,
-        activePlayerPositions.length,
       ),
 
       activePlayerPositions:
@@ -80,7 +82,6 @@ class SessionStateService {
 
   List<PlayerScore> _computeScores(
     Session session,
-    int activePlayerCount,
   ) {
     final scores = List.generate(
       session.playerCount,
@@ -91,15 +92,45 @@ class SessionStateService {
     );
 
     for (final deal in session.deals) {
+      //----------------------------------------------------------------------
+      // Contexte de la donne
+      //----------------------------------------------------------------------
+
+      final dealerPosition =
+          (session.firstDealerPosition +
+                  deal.number -
+                  1) %
+              session.playerCount;
+
+      final deadPlayerPositions =
+          _deadPlayers(
+        session,
+        dealerPosition,
+      );
+
+      final activePlayerPositions =
+          _activePlayers(
+        session,
+        deadPlayerPositions,
+      );
+
+      final context = DealContext(
+        activePlayerPositions:
+            activePlayerPositions,
+        deadPlayerPositions:
+            deadPlayerPositions,
+        dealerPosition:
+            dealerPosition,
+      );
+
+      //----------------------------------------------------------------------
+      // Calcul
+      //----------------------------------------------------------------------
+
       final calculation =
           ruleEngine.calculate(
         profile: session.ruleProfile,
-
-        // Nombre de joueurs de la donne
-        // (3 à 5), et non de la session.
-        playerCount:
-            activePlayerCount,
-
+        context: context,
         deal: deal,
       );
 
@@ -111,6 +142,10 @@ class SessionStateService {
           'Le RuleEngine n\'a produit aucun score.',
         );
       }
+
+      //----------------------------------------------------------------------
+      // Cumul
+      //----------------------------------------------------------------------
 
       for (final entry
           in dealScores.entries) {

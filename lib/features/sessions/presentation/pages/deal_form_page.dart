@@ -152,7 +152,11 @@ class _DealFormPageState
         builder: (_) =>
             DealResultDialog(
           calculation: calculation,
-          players: state.activePlayers,
+
+          // Les scores sont maintenant indexés
+          // par position dans la session.
+          players:
+              state.session.players,
         ),
       );
 

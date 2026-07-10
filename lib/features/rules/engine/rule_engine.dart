@@ -12,6 +12,7 @@ import '../../sessions/models/deal.dart';
 import '../models/rule_profile.dart';
 import 'calculators/calculator.dart';
 import 'pipeline/deal_calculation.dart';
+import 'pipeline/deal_context.dart';
 
 class RuleEngine {
   final List<Calculator> _calculators;
@@ -26,12 +27,12 @@ class RuleEngine {
 
   DealCalculation calculate({
     required RuleProfile profile,
-    required int playerCount,
+    required DealContext context,
     required Deal deal,
   }) {
     var calculation = DealCalculation(
       profile: profile,
-      playerCount: playerCount,
+      context: context,
       deal: deal,
     );
 

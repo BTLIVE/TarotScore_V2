@@ -11,6 +11,7 @@
 // ***************************************************************************
 
 import '../../rules/engine/pipeline/deal_calculation.dart';
+import '../../rules/engine/pipeline/deal_context.dart';
 import '../../rules/engine/rule_engine.dart';
 import '../../rules/factories/rule_engine_factory.dart';
 
@@ -61,8 +62,16 @@ class SessionPlayService {
     return _ruleEngine.calculate(
       profile:
           current.session.ruleProfile,
-      playerCount:
-          current.activePlayerPositions.length,
+
+      context: DealContext(
+        activePlayerPositions:
+            current.activePlayerPositions,
+        deadPlayerPositions:
+            current.deadPlayerPositions,
+        dealerPosition:
+            current.nextDealerPosition,
+      ),
+
       deal: deal,
     );
   }

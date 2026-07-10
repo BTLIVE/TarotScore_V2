@@ -8,17 +8,38 @@
 // Auteur : David
 // ***************************************************************************
 
+import 'package:flutter/foundation.dart';
+
 import '../exceptions/invalid_deal_exception.dart';
 import '../pipeline/deal_calculation.dart';
 import 'calculator.dart';
 
-class ScoreDistributionCalculator implements Calculator {
+class ScoreDistributionCalculator
+    implements Calculator {
   const ScoreDistributionCalculator();
 
   @override
   DealCalculation calculate(
     DealCalculation calculation,
   ) {
+    debugPrint('----------------------------------------');
+    debugPrint('ScoreDistributionCalculator');
+    debugPrint(
+      'playerCount = ${calculation.playerCount}',
+    );
+    debugPrint(
+      'activePlayers = ${calculation.context.activePlayerPositions}',
+    );
+    debugPrint(
+      'dealer = ${calculation.context.dealerPosition}',
+    );
+    debugPrint(
+      'attacker = ${calculation.deal.attackerPosition}',
+    );
+    debugPrint(
+      'partner = ${calculation.deal.partnerPosition}',
+    );
+
     final deal = calculation.deal;
     final score = calculation.finalScore;
 
@@ -56,6 +77,28 @@ class ScoreDistributionCalculator implements Calculator {
   }
 
   //--------------------------------------------------------------------------
+  // Création des scores de défense
+  //--------------------------------------------------------------------------
+
+  Map<int, int> _createDefenseScores(
+    DealCalculation calculation,
+    int score,
+  ) {
+    final scores = <int, int>{};
+
+    for (final position
+        in calculation.context.activePlayerPositions) {
+      scores[position] = -score;
+    }
+
+    debugPrint(
+      'Défense : $scores',
+    );
+
+    return scores;
+  }
+
+  //--------------------------------------------------------------------------
   // 4 joueurs
   //--------------------------------------------------------------------------
 
@@ -63,14 +106,18 @@ class ScoreDistributionCalculator implements Calculator {
     DealCalculation calculation,
     int score,
   ) {
-    final scores = <int, int>{};
-
-    for (var i = 0; i < 4; i++) {
-      scores[i] = -score;
-    }
+    final scores =
+        _createDefenseScores(
+      calculation,
+      score,
+    );
 
     scores[calculation.deal.attackerPosition] =
         score * 3;
+
+    debugPrint(
+      'Scores finaux : $scores',
+    );
 
     _checkBalance(scores);
 
@@ -103,16 +150,20 @@ class ScoreDistributionCalculator implements Calculator {
       );
     }
 
-    final scores = <int, int>{};
-
-    for (var i = 0; i < 5; i++) {
-      scores[i] = -score;
-    }
+    final scores =
+        _createDefenseScores(
+      calculation,
+      score,
+    );
 
     scores[calculation.deal.attackerPosition] =
         score * 2;
 
     scores[partner] = score;
+
+    debugPrint(
+      'Scores finaux : $scores',
+    );
 
     _checkBalance(scores);
 
@@ -129,14 +180,18 @@ class ScoreDistributionCalculator implements Calculator {
     DealCalculation calculation,
     int score,
   ) {
-    final scores = <int, int>{};
-
-    for (var i = 0; i < 5; i++) {
-      scores[i] = -score;
-    }
+    final scores =
+        _createDefenseScores(
+      calculation,
+      score,
+    );
 
     scores[calculation.deal.attackerPosition] =
         score * 4;
+
+    debugPrint(
+      'Scores finaux : $scores',
+    );
 
     _checkBalance(scores);
 
@@ -155,6 +210,10 @@ class ScoreDistributionCalculator implements Calculator {
     final total = scores.values.fold(
       0,
       (sum, value) => sum + value,
+    );
+
+    debugPrint(
+      'Somme = $total',
     );
 
     if (total != 0) {

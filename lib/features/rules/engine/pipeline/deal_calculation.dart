@@ -11,6 +11,7 @@
 import '../../../sessions/models/applied_bonus.dart';
 import '../../../sessions/models/deal.dart';
 import '../../models/rule_profile.dart';
+import 'deal_context.dart';
 
 class DealCalculation {
   //--------------------------------------------------------------------------
@@ -20,8 +21,8 @@ class DealCalculation {
   /// Profil de règles utilisé.
   final RuleProfile profile;
 
-  /// Nombre de joueurs de la donne.
-  final int playerCount;
+  /// Contexte de la donne.
+  final DealContext context;
 
   /// Manche à calculer.
   final Deal deal;
@@ -68,7 +69,7 @@ class DealCalculation {
 
   const DealCalculation({
     required this.profile,
-    required this.playerCount,
+    required this.context,
     required this.deal,
     this.success,
     this.target,
@@ -87,7 +88,7 @@ class DealCalculation {
 
   DealCalculation copyWith({
     RuleProfile? profile,
-    int? playerCount,
+    DealContext? context,
     Deal? deal,
     bool? success,
     double? target,
@@ -101,7 +102,7 @@ class DealCalculation {
   }) {
     return DealCalculation(
       profile: profile ?? this.profile,
-      playerCount: playerCount ?? this.playerCount,
+      context: context ?? this.context,
       deal: deal ?? this.deal,
       success: success ?? this.success,
       target: target ?? this.target,
@@ -127,6 +128,10 @@ class DealCalculation {
   //--------------------------------------------------------------------------
   // Getters
   //--------------------------------------------------------------------------
+
+  /// Nombre de joueurs participant à la donne.
+  int get playerCount =>
+      context.playerCount;
 
   /// Des bonus ont été appliqués.
   bool get hasBonuses =>

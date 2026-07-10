@@ -126,9 +126,42 @@ class DealResultDialog extends StatelessWidget {
                 height: AppSpacing.lg,
               ),
 
-              //--------------------------------------------------------------
+              //----------------------------------------------------------------
+              // Bonus appliqués
+              //----------------------------------------------------------------
+
+              if (calculation
+                  .appliedBonuses.isNotEmpty) ...[
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Bonus appliqués',
+                        style: TextStyle(
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: AppSpacing.md,
+                      ),
+
+                      ..._buildBonuses(),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(
+                  height: AppSpacing.lg,
+                ),
+              ],
+
+              //----------------------------------------------------------------
               // Répartition
-              //--------------------------------------------------------------
+              //----------------------------------------------------------------
 
               AppCard(
                 child: Column(
@@ -204,6 +237,39 @@ class DealResultDialog extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  //---------------------------------------------------------------------------
+  // Bonus
+  //---------------------------------------------------------------------------
+
+  List<Widget> _buildBonuses() {
+    return calculation.appliedBonuses.map(
+      (bonus) {
+        final label = bonus.hasDescription
+            ? '${bonus.name} (${bonus.description})'
+            : bonus.name;
+
+        return Padding(
+          padding:
+              const EdgeInsets.symmetric(
+            vertical: 2,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(label),
+              ),
+              Text(
+                bonus.value > 0
+                    ? '+${bonus.value}'
+                    : '${bonus.value}',
+              ),
+            ],
+          ),
+        );
+      },
+    ).toList();
   }
 
   //---------------------------------------------------------------------------
