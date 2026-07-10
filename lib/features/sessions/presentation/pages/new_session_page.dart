@@ -23,9 +23,11 @@ import '../../../players/services/player_service.dart';
 import '../../../rules/factories/official_rule_profiles.dart';
 
 import '../../models/session_player.dart';
+import '../../models/table_setup_result.dart';
+
 import '../../services/session_service.dart';
 
-import '../widgets/dealer_selection_card.dart';
+import 'table_setup_page.dart';
 import '../widgets/player_selection_card.dart';
 
 class NewSessionPage extends StatefulWidget {
@@ -40,17 +42,27 @@ class NewSessionPage extends StatefulWidget {
 
 class _NewSessionPageState
     extends State<NewSessionPage> {
+  //---------------------------------------------------------------------------
+  // Dépendances
+  //---------------------------------------------------------------------------
+
   final PlayerService _playerService =
       PlayerService.instance;
 
   final SessionService _sessionService =
       SessionService.instance;
 
+  //---------------------------------------------------------------------------
+  // Etat
+  //---------------------------------------------------------------------------
+
   List<SessionPlayer> _players = [];
 
-  SessionPlayer? _dealer;
-
   bool _loading = true;
+
+  //---------------------------------------------------------------------------
+  // Lifecycle
+  //---------------------------------------------------------------------------
 
   @override
   void initState() {
@@ -80,77 +92,49 @@ class _NewSessionPageState
     });
   }
 
-  void _refresh() {
-    if (_dealer != null &&
-        !_dealer!.selected) {
-      _dealer = null;
-    }
+  //---------------------------------------------------------------------------
+  // Rafraîchissement
+  //---------------------------------------------------------------------------
 
+  void _refresh() {
     setState(() {});
   }
 
-  //--------------------------------------------------------------------------
-  // Création de la session
-  //--------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Création
+  //---------------------------------------------------------------------------
 
   Future<void> _startSession() async {
-    debugPrint('=== START SESSION ===');
-
-    if (_dealer == null) {
-      debugPrint('Aucun donneur sélectionné.');
-      return;
-    }
-
     final selectedPlayers = _players
         .where((p) => p.selected)
-        .toList();
+        .map((p) => p.player)
+        .toList(growable: false);
 
-    final dealerPosition =
-        selectedPlayers.indexWhere(
-      (player) =>
-          player.player.uuid ==
-          _dealer!.player.uuid,
+    final result =
+        await Navigator.push<TableSetupResult>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TableSetupPage(
+          players: selectedPlayers,
+        ),
+      ),
     );
 
-    debugPrint(
-      'Joueurs sélectionnés : ${selectedPlayers.length}',
-    );
-
-    debugPrint(
-      'Position donneur : $dealerPosition',
-    );
-
-    try {
-      _sessionService.start(
-        ruleProfile:
-            OfficialRuleProfiles.fft(),
-        players: selectedPlayers
-            .map((p) => p.player)
-            .toList(),
-        firstDealerPosition:
-            dealerPosition,
-      );
-
-      debugPrint(
-        'Session créée avec succès.',
-      );
-    } catch (e, stackTrace) {
-      debugPrint(
-        'Erreur SessionService.start()',
-      );
-      debugPrint(e.toString());
-      debugPrint(stackTrace.toString());
-
+    if (!mounted || result == null) {
       return;
     }
+
+    _sessionService.start(
+      ruleProfile:
+          OfficialRuleProfiles.fft(),
+      players: result.players,
+      firstDealerPosition:
+          result.firstDealerPosition,
+    );
 
     if (!mounted) {
       return;
     }
-
-    debugPrint(
-      'Navigation vers CurrentSession.',
-    );
 
     Navigator.pushReplacementNamed(
       context,
@@ -158,12 +142,19 @@ class _NewSessionPageState
     );
   }
 
+  //---------------------------------------------------------------------------
+  // Validation
+  //---------------------------------------------------------------------------
+
   bool get _canCreate =>
-      _dealer != null &&
       _players
               .where((p) => p.selected)
               .length >=
           3;
+
+  //---------------------------------------------------------------------------
+  // UI
+  //---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +177,7 @@ class _NewSessionPageState
                     ),
                   ),
                 ),
+
                 AppSection(
                   title: 'Joueurs',
                   child: PlayerSelectionCard(
@@ -193,25 +185,13 @@ class _NewSessionPageState
                     onChanged: _refresh,
                   ),
                 ),
-                AppSection(
-                  title: 'Premier donneur',
-                  child: DealerSelectionCard(
-                    players: _players,
-                    dealer: _dealer,
-                    onDealerChanged:
-                        (player) {
-                      setState(() {
-                        _dealer = player;
-                      });
-                    },
-                  ),
-                ),
+
                 const SizedBox(
                   height: AppSpacing.xl,
                 ),
+
                 AppButton(
-                  label:
-                      'Créer la partie',
+                  label: 'Suivant',
                   onPressed: _canCreate
                       ? _startSession
                       : null,
