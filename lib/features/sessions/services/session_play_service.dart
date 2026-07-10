@@ -10,6 +10,8 @@
 //
 // ***************************************************************************
 
+import '../../rules/engine/pipeline/deal_calculation.dart';
+import '../../rules/engine/rule_engine.dart';
 import '../../rules/factories/rule_engine_factory.dart';
 
 import '../models/deal.dart';
@@ -33,14 +35,37 @@ class SessionPlayService {
   final DealService _dealService =
       const DealService();
 
+  /// Moteur de calcul.
+  final RuleEngine _ruleEngine =
+      RuleEngineFactory.create();
+
   late final SessionStateService
       _stateService =
           SessionStateService(
-    ruleEngine:
-        RuleEngineFactory.create(),
+    ruleEngine: _ruleEngine,
     dealerService:
         const DealerService(),
   );
+
+  //--------------------------------------------------------------------------
+  // Prévisualisation d'une donne
+  //--------------------------------------------------------------------------
+
+  DealCalculation previewDeal({
+    required Deal deal,
+  }) {
+    final current =
+        SessionService.instance
+            .requireCurrentSession();
+
+    return _ruleEngine.calculate(
+      profile:
+          current.session.ruleProfile,
+      playerCount:
+          current.activePlayerPositions.length,
+      deal: deal,
+    );
+  }
 
   //--------------------------------------------------------------------------
   // Joue une donne

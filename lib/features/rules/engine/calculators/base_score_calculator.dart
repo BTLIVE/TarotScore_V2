@@ -43,6 +43,11 @@ class BaseScoreCalculator implements Calculator {
 
     return calculation.copyWith(
       success: success,
+
+      target: target.toDouble(),
+
+      difference: difference,
+
       baseScore: baseScore,
     );
   }

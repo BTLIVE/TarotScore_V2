@@ -11,6 +11,7 @@
 // ***************************************************************************
 
 import '../engine/calculators/base_score_calculator.dart';
+import '../engine/calculators/bonus_calculator.dart';
 import '../engine/calculators/contract_multiplier_calculator.dart';
 import '../engine/calculators/score_distribution_calculator.dart';
 import '../engine/calculators/validation_calculator.dart';
@@ -25,6 +26,10 @@ class RuleEngineFactory {
         ValidationCalculator(),
         BaseScoreCalculator(),
         ContractMultiplierCalculator(),
+
+        // Préparation des futurs bonus.
+        BonusCalculator(),
+
         ScoreDistributionCalculator(),
       ],
     );

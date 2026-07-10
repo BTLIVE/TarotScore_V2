@@ -16,6 +16,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/session_state.dart';
@@ -49,6 +50,10 @@ class CurrentSessionRepository {
       await directory.create(
         recursive: true,
       );
+
+      debugPrint(
+        'JSON directory created : ${directory.path}',
+      );
     }
 
     return File(
@@ -63,18 +68,44 @@ class CurrentSessionRepository {
   Future<void> save(
     SessionState state,
   ) async {
-    final file = await _getFile();
+    try {
+      debugPrint(
+        '========== SAVE CURRENT SESSION =========='
+      );
 
-    final json = jsonEncode(
-      SessionStateSerializer.toJson(
-        state,
-      ),
-    );
+      final file = await _getFile();
 
-    await file.writeAsString(
-      json,
-      flush: true,
-    );
+      debugPrint(
+        'File : ${file.path}',
+      );
+
+      final json = jsonEncode(
+        SessionStateSerializer.toJson(
+          state,
+        ),
+      );
+
+      debugPrint(
+        'JSON size : ${json.length}',
+      );
+
+      await file.writeAsString(
+        json,
+        flush: true,
+      );
+
+      debugPrint(
+        'SAVE OK'
+      );
+    } catch (e, stack) {
+      debugPrint(
+        'SAVE ERROR : $e',
+      );
+
+      debugPrint(
+        stack.toString(),
+      );
+    }
   }
 
   //--------------------------------------------------------------------------
@@ -82,22 +113,61 @@ class CurrentSessionRepository {
   //--------------------------------------------------------------------------
 
   Future<SessionState?> load() async {
-    final file = await _getFile();
+    try {
+      debugPrint(
+        '========== LOAD CURRENT SESSION =========='
+      );
 
-    if (!await file.exists()) {
+      final file = await _getFile();
+
+      debugPrint(
+        'File : ${file.path}',
+      );
+
+      if (!await file.exists()) {
+        debugPrint(
+          'No current session file.'
+        );
+
+        return null;
+      }
+
+      debugPrint(
+        'File found.'
+      );
+
+      final json =
+          await file.readAsString();
+
+      debugPrint(
+        'JSON size : ${json.length}',
+      );
+
+      final map =
+          jsonDecode(json)
+              as Map<String, dynamic>;
+
+      final state =
+          SessionStateSerializer.fromJson(
+        map,
+      );
+
+      debugPrint(
+        'LOAD OK'
+      );
+
+      return state;
+    } catch (e, stack) {
+      debugPrint(
+        'LOAD ERROR : $e',
+      );
+
+      debugPrint(
+        stack.toString(),
+      );
+
       return null;
     }
-
-    final json =
-        await file.readAsString();
-
-    final map =
-        jsonDecode(json)
-            as Map<String, dynamic>;
-
-    return SessionStateSerializer.fromJson(
-      map,
-    );
   }
 
   //--------------------------------------------------------------------------
@@ -107,7 +177,14 @@ class CurrentSessionRepository {
   Future<bool> exists() async {
     final file = await _getFile();
 
-    return file.exists();
+    final exists =
+        await file.exists();
+
+    debugPrint(
+      'Current session exists : $exists',
+    );
+
+    return exists;
   }
 
   //--------------------------------------------------------------------------
@@ -115,10 +192,20 @@ class CurrentSessionRepository {
   //--------------------------------------------------------------------------
 
   Future<void> delete() async {
-    final file = await _getFile();
+    try {
+      final file = await _getFile();
 
-    if (await file.exists()) {
-      await file.delete();
+      if (await file.exists()) {
+        await file.delete();
+
+        debugPrint(
+          'Current session deleted.',
+        );
+      }
+    } catch (e) {
+      debugPrint(
+        'DELETE ERROR : $e',
+      );
     }
   }
 }

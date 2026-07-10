@@ -18,11 +18,13 @@ import '../../../../core/widgets/app_page.dart';
 
 import '../../../players/models/player.dart';
 import '../../../rules/engine/models/deal_event.dart';
+import '../../../rules/engine/pipeline/deal_calculation.dart';
 
 import '../../services/deal_factory.dart';
 import '../../services/session_play_service.dart';
 import '../../services/session_service.dart';
 
+import '../dialogs/deal_result_dialog.dart';
 import '../widgets/deal/deal_bonus_card.dart';
 import '../widgets/deal/deal_contract_card.dart';
 import '../widgets/deal/deal_players_card.dart';
@@ -90,7 +92,7 @@ class _DealFormPageState
   // Validation de la donne
   //--------------------------------------------------------------------------
 
-  void _validateDeal() {
+  Future<void> _validateDeal() async {
     final state =
         SessionService.instance
             .requireCurrentSession();
@@ -129,7 +131,41 @@ class _DealFormPageState
     );
 
     try {
-      SessionPlayService.instance.playDeal(
+      //----------------------------------------------------------------------
+      // Prévisualisation
+      //----------------------------------------------------------------------
+
+      final DealCalculation calculation =
+          SessionPlayService.instance
+              .previewDeal(
+        deal: deal,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      final confirmed =
+          await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) =>
+            DealResultDialog(
+          calculation: calculation,
+          players: state.activePlayers,
+        ),
+      );
+
+      if (confirmed != true) {
+        return;
+      }
+
+      //----------------------------------------------------------------------
+      // Validation définitive
+      //----------------------------------------------------------------------
+
+      SessionPlayService.instance
+          .playDeal(
         deal: deal,
       );
 

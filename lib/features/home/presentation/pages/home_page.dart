@@ -4,10 +4,52 @@ import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-class HomePage extends StatelessWidget {
+import '../../../sessions/services/session_service.dart';
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  void _notImplemented(BuildContext context) {
+  @override
+  State<HomePage> createState() =>
+      _HomePageState();
+}
+
+class _HomePageState
+    extends State<HomePage> {
+  bool _hasCurrentSession = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _restoreCurrentSession();
+  }
+
+  //--------------------------------------------------------------------------
+  // Restauration de la partie en cours
+  //--------------------------------------------------------------------------
+
+  Future<void> _restoreCurrentSession()
+  async {
+    final restored =
+        await SessionService.instance
+            .restoreCurrentSession();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _hasCurrentSession =
+          restored;
+    });
+  }
+
+  //--------------------------------------------------------------------------
+  // Fonctionnalités non disponibles
+  //--------------------------------------------------------------------------
+
+  void _notImplemented() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
@@ -21,7 +63,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TarotScore V2'),
+        title: const Text(
+          'TarotScore V2',
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(
@@ -31,19 +75,52 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment:
               CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(
+              height: AppSpacing.md,
+            ),
 
             const Text(
               'Bienvenue',
               style: AppTextStyles.title,
-              textAlign: TextAlign.center,
+              textAlign:
+                  TextAlign.center,
             ),
 
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(
+              height: AppSpacing.xl,
+            ),
+
+            //----------------------------------------------------------------
+            // Reprendre la partie
+            //----------------------------------------------------------------
+
+            if (_hasCurrentSession) ...[
+              _HomeButton(
+                icon: Icons.restore,
+                title:
+                    'Reprendre la partie',
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes
+                        .currentSession,
+                  );
+                },
+              ),
+
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
+            ],
+
+            //----------------------------------------------------------------
+            // Nouvelle partie
+            //----------------------------------------------------------------
 
             _HomeButton(
               icon: Icons.play_arrow,
-              title: 'Nouvelle partie',
+              title:
+                  'Nouvelle partie',
               onPressed: () {
                 Navigator.pushNamed(
                   context,
@@ -52,7 +129,13 @@ class HomePage extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(
+              height: AppSpacing.md,
+            ),
+
+            //----------------------------------------------------------------
+            // Joueurs
+            //----------------------------------------------------------------
 
             _HomeButton(
               icon: Icons.people,
@@ -65,15 +148,28 @@ class HomePage extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(
+              height: AppSpacing.md,
+            ),
+
+            //----------------------------------------------------------------
+            // Historique
+            //----------------------------------------------------------------
 
             _HomeButton(
               icon: Icons.history,
               title: 'Historique',
-              onPressed: () => _notImplemented(context),
+              onPressed:
+                  _notImplemented,
             ),
 
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(
+              height: AppSpacing.md,
+            ),
+
+            //----------------------------------------------------------------
+            // Paramètres
+            //----------------------------------------------------------------
 
             _HomeButton(
               icon: Icons.settings,
@@ -90,8 +186,10 @@ class HomePage extends StatelessWidget {
 
             const Text(
               'Version 2.0',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.caption,
+              textAlign:
+                  TextAlign.center,
+              style:
+                  AppTextStyles.caption,
             ),
           ],
         ),
@@ -100,7 +198,8 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _HomeButton extends StatelessWidget {
+class _HomeButton
+    extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onPressed;
@@ -112,12 +211,15 @@ class _HomeButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return FilledButton.icon(
       onPressed: onPressed,
       icon: Icon(icon),
       label: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding:
+            const EdgeInsets.symmetric(
           vertical: AppSpacing.md,
         ),
         child: Text(title),

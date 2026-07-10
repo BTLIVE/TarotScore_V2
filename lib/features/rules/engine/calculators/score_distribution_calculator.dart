@@ -20,11 +20,11 @@ class ScoreDistributionCalculator implements Calculator {
     DealCalculation calculation,
   ) {
     final deal = calculation.deal;
-    final score = calculation.contractScore;
+    final score = calculation.finalScore;
 
     if (score == null) {
       throw InvalidDealException(
-        'Le score du contrat n\'est pas calculé.',
+        'Le score final n\'est pas calculé.',
       );
     }
 
@@ -69,7 +69,8 @@ class ScoreDistributionCalculator implements Calculator {
       scores[i] = -score;
     }
 
-    scores[calculation.deal.attackerPosition] = score * 3;
+    scores[calculation.deal.attackerPosition] =
+        score * 3;
 
     _checkBalance(scores);
 
@@ -86,7 +87,8 @@ class ScoreDistributionCalculator implements Calculator {
     DealCalculation calculation,
     int score,
   ) {
-    final partner = calculation.deal.partnerPosition;
+    final partner =
+        calculation.deal.partnerPosition;
 
     if (partner == null) {
       throw InvalidDealException(
@@ -94,7 +96,8 @@ class ScoreDistributionCalculator implements Calculator {
       );
     }
 
-    if (partner == calculation.deal.attackerPosition) {
+    if (partner ==
+        calculation.deal.attackerPosition) {
       throw InvalidDealException(
         'Le partenaire ne peut pas être le preneur.',
       );
@@ -106,7 +109,9 @@ class ScoreDistributionCalculator implements Calculator {
       scores[i] = -score;
     }
 
-    scores[calculation.deal.attackerPosition] = score * 2;
+    scores[calculation.deal.attackerPosition] =
+        score * 2;
+
     scores[partner] = score;
 
     _checkBalance(scores);
@@ -130,7 +135,8 @@ class ScoreDistributionCalculator implements Calculator {
       scores[i] = -score;
     }
 
-    scores[calculation.deal.attackerPosition] = score * 4;
+    scores[calculation.deal.attackerPosition] =
+        score * 4;
 
     _checkBalance(scores);
 

@@ -8,6 +8,7 @@
 // Auteur : David
 // ***************************************************************************
 
+import '../../../sessions/models/applied_bonus.dart';
 import '../../../sessions/models/deal.dart';
 import '../../models/rule_profile.dart';
 
@@ -19,7 +20,7 @@ class DealCalculation {
   /// Profil de règles utilisé.
   final RuleProfile profile;
 
-  /// Nombre de joueurs de la partie.
+  /// Nombre de joueurs de la donne.
   final int playerCount;
 
   /// Manche à calculer.
@@ -32,11 +33,28 @@ class DealCalculation {
   /// Contrat réussi.
   final bool? success;
 
+  /// Nombre de points nécessaires pour réussir.
+  final double? target;
+
+  /// Ecart entre les points réalisés et l'objectif.
+  ///
+  /// Positif si le contrat est réussi.
+  final double? difference;
+
   /// Score de base (25 + écart).
   final int? baseScore;
 
-  /// Score après application du multiplicateur de contrat.
+  /// Multiplicateur du contrat.
+  final int? contractMultiplier;
+
+  /// Score après application du multiplicateur.
   final int? contractScore;
+
+  /// Bonus effectivement appliqués.
+  final List<AppliedBonus> appliedBonuses;
+
+  /// Score final de la donne.
+  final int? finalScore;
 
   /// Score final de chaque joueur.
   ///
@@ -53,8 +71,13 @@ class DealCalculation {
     required this.playerCount,
     required this.deal,
     this.success,
+    this.target,
+    this.difference,
     this.baseScore,
+    this.contractMultiplier,
     this.contractScore,
+    this.appliedBonuses = const [],
+    this.finalScore,
     this.playerScores,
   });
 
@@ -67,8 +90,13 @@ class DealCalculation {
     int? playerCount,
     Deal? deal,
     bool? success,
+    double? target,
+    double? difference,
     int? baseScore,
+    int? contractMultiplier,
     int? contractScore,
+    List<AppliedBonus>? appliedBonuses,
+    int? finalScore,
     Map<int, int>? playerScores,
   }) {
     return DealCalculation(
@@ -76,9 +104,46 @@ class DealCalculation {
       playerCount: playerCount ?? this.playerCount,
       deal: deal ?? this.deal,
       success: success ?? this.success,
+      target: target ?? this.target,
+      difference:
+          difference ?? this.difference,
       baseScore: baseScore ?? this.baseScore,
-      contractScore: contractScore ?? this.contractScore,
-      playerScores: playerScores ?? this.playerScores,
+      contractMultiplier:
+          contractMultiplier ??
+              this.contractMultiplier,
+      contractScore:
+          contractScore ??
+              this.contractScore,
+      appliedBonuses:
+          appliedBonuses ??
+              this.appliedBonuses,
+      finalScore:
+          finalScore ?? this.finalScore,
+      playerScores:
+          playerScores ?? this.playerScores,
     );
   }
+
+  //--------------------------------------------------------------------------
+  // Getters
+  //--------------------------------------------------------------------------
+
+  /// Des bonus ont été appliqués.
+  bool get hasBonuses =>
+      appliedBonuses.isNotEmpty;
+
+  /// Les scores joueurs sont disponibles.
+  bool get hasPlayerScores =>
+      playerScores != null;
+
+  /// Le calcul est terminé.
+  bool get isComplete =>
+      success != null &&
+      target != null &&
+      difference != null &&
+      baseScore != null &&
+      contractMultiplier != null &&
+      contractScore != null &&
+      finalScore != null &&
+      playerScores != null;
 }

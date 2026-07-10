@@ -12,6 +12,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_page.dart';
@@ -54,11 +55,23 @@ class _CurrentSessionPageState
     }
   }
 
-    //--------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
   // Retour à l'accueil
   //--------------------------------------------------------------------------
 
-  Future<void> _backToHome() async {
+  void _backToHome() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.home,
+      (route) => false,
+    );
+  }
+
+  //--------------------------------------------------------------------------
+  // Fin de partie
+  //--------------------------------------------------------------------------
+
+  Future<void> _finishSession() async {
     await SessionService.instance
         .closeAndSaveCurrentSession();
 
@@ -66,8 +79,10 @@ class _CurrentSessionPageState
       return;
     }
 
-    Navigator.of(context).popUntil(
-      (route) => route.isFirst,
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.home,
+      (route) => false,
     );
   }
 
@@ -121,23 +136,18 @@ class _CurrentSessionPageState
                       .textTheme
                       .titleMedium,
                 ),
-
                 const SizedBox(
                   height: AppSpacing.md,
                 ),
-
                 Text(
                   'Profil : ${session.ruleProfile.name}',
                 ),
-
                 Text(
                   'Participants : ${session.playerCount}',
                 ),
-
                 Text(
                   'Donne n°${state.nextDealNumber}',
                 ),
-
                 Text(
                   'Prochain donneur : '
                   '${session.players[state.nextDealerPosition].firstName}',
@@ -179,11 +189,9 @@ class _CurrentSessionPageState
                       .textTheme
                       .titleMedium,
                 ),
-
                 const SizedBox(
                   height: AppSpacing.md,
                 ),
-
                 ...state.activePlayers.map(
                   (player) => ListTile(
                     dense: true,
@@ -226,12 +234,10 @@ class _CurrentSessionPageState
                         .textTheme
                         .titleMedium,
                   ),
-
                   const SizedBox(
                     height:
                         AppSpacing.md,
                   ),
-
                   ...state.deadPlayers.map(
                     (player) =>
                         ListTile(
@@ -295,6 +301,20 @@ class _CurrentSessionPageState
             ),
             label: const Text(
               'Retour à l\'accueil',
+            ),
+          ),
+
+          const SizedBox(
+            height: AppSpacing.md,
+          ),
+
+          FilledButton.icon(
+            onPressed: _finishSession,
+            icon: const Icon(
+              Icons.flag,
+            ),
+            label: const Text(
+              'Terminer la partie',
             ),
           ),
 

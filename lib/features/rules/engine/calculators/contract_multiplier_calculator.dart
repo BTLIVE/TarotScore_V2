@@ -15,6 +15,10 @@ import 'calculator.dart';
 class ContractMultiplierCalculator implements Calculator {
   const ContractMultiplierCalculator();
 
+  //--------------------------------------------------------------------------
+  // Calcul
+  //--------------------------------------------------------------------------
+
   @override
   DealCalculation calculate(
     DealCalculation calculation,
@@ -40,10 +44,14 @@ class ContractMultiplierCalculator implements Calculator {
 
     final contractScore = baseScore * multiplier;
 
+    final signedScore = success
+        ? contractScore
+        : -contractScore;
+
     return calculation.copyWith(
-      contractScore: success
-          ? contractScore
-          : -contractScore,
+      contractMultiplier: multiplier,
+      contractScore: signedScore,
+      finalScore: signedScore,
     );
   }
 }

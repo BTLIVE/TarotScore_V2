@@ -10,6 +10,8 @@
 //
 // ***************************************************************************
 
+import 'dart:async';
+
 import 'package:uuid/uuid.dart';
 
 import '../../players/models/player.dart';
@@ -18,6 +20,8 @@ import '../../rules/models/rule_profile.dart';
 import '../models/player_score.dart';
 import '../models/session.dart';
 import '../models/session_state.dart';
+
+import '../repositories/current_session_repository.dart';
 import '../repositories/session_repository.dart';
 
 class SessionService {
@@ -31,6 +35,10 @@ class SessionService {
   static final SessionRepository
       _repository =
       SessionRepository.instance;
+
+  static final CurrentSessionRepository
+      _currentRepository =
+      CurrentSessionRepository.instance;
 
   //--------------------------------------------------------------------------
   // Session courante
@@ -158,7 +166,9 @@ class SessionService {
                   !deadPlayerPositions
                       .contains(index),
             )
-            .toList(growable: false);
+            .toList(
+              growable: false,
+            );
 
     _currentSession = SessionState(
       session: session,
@@ -170,6 +180,12 @@ class SessionService {
       nextDealNumber: 1,
       nextDealerPosition:
           firstDealerPosition,
+    );
+
+    unawaited(
+      _currentRepository.save(
+        _currentSession!,
+      ),
     );
 
     return _currentSession!;
@@ -184,18 +200,29 @@ class SessionService {
     SessionState state,
   ) {
     _currentSession = state;
+
+    unawaited(
+      _currentRepository.save(
+        state,
+      ),
+    );
   }
 
   /// Ferme la session en cours.
   void closeCurrentSession() {
     _currentSession = null;
+
+    unawaited(
+      _currentRepository.delete(),
+    );
   }
 
   //--------------------------------------------------------------------------
   // Persistance
   //--------------------------------------------------------------------------
 
-  /// Sauvegarde la session courante.
+  /// Sauvegarde la session courante
+  /// dans les archives SQLite.
   Future<void> saveCurrentSession() async {
     final state = requireCurrentSession();
 
@@ -204,21 +231,45 @@ class SessionService {
     );
 
     await _repository.savePlayerScores(
-      sessionUuid: state.session.uuid,
-      players: state.session.players,
-      playerScores: state.playerScores,
+      sessionUuid:
+          state.session.uuid,
+      players:
+          state.session.players,
+      playerScores:
+          state.playerScores,
     );
   }
 
-  /// Sauvegarde puis ferme la session.
-  Future<void> closeAndSaveCurrentSession() async {
+  /// Archive puis ferme la session.
+  Future<void>
+      closeAndSaveCurrentSession() async {
     if (!hasCurrentSession) {
       return;
     }
 
     await saveCurrentSession();
 
-    _currentSession = null;
+    closeCurrentSession();
+  }
+
+  //--------------------------------------------------------------------------
+  // Restauration
+  //--------------------------------------------------------------------------
+
+  /// Recharge la partie en cours depuis le fichier JSON.
+  ///
+  /// Retourne true si une partie a été restaurée.
+  Future<bool> restoreCurrentSession() async {
+    final state =
+        await _currentRepository.load();
+
+    if (state == null) {
+      return false;
+    }
+
+    _currentSession = state;
+
+    return true;
   }
 
   //--------------------------------------------------------------------------
