@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:tarotscore_v2/features/rules/engine/calculators/validation_calculator.dart';
 import 'package:tarotscore_v2/features/rules/engine/exceptions/invalid_deal_exception.dart';
 import 'package:tarotscore_v2/features/rules/engine/pipeline/deal_calculation.dart';
+import 'package:tarotscore_v2/features/rules/engine/pipeline/deal_context.dart';
 import 'package:tarotscore_v2/features/rules/factories/official_rule_profiles.dart';
 import 'package:tarotscore_v2/features/sessions/models/deal.dart';
 
@@ -33,7 +34,14 @@ void main() {
 
     return DealCalculation(
       profile: profile,
-      playerCount: playerCount,
+      context: DealContext(
+        activePlayerPositions: List<int>.generate(
+          playerCount,
+          (index) => index,
+        ),
+        deadPlayerPositions: const [],
+        dealerPosition: 0,
+      ),
       deal: deal,
     );
   }

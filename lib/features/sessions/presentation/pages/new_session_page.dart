@@ -20,15 +20,17 @@ import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_section.dart';
 
 import '../../../players/services/player_service.dart';
-import '../../../rules/factories/official_rule_profiles.dart';
+
+import '../../../rules/models/rule_profile.dart';
+import '../../../rules/services/rule_profile_service.dart';
 
 import '../../models/session_player.dart';
 import '../../models/table_setup_result.dart';
 
 import '../../services/session_service.dart';
 
-import 'table_setup_page.dart';
 import '../widgets/player_selection_card.dart';
+import 'table_setup_page.dart';
 
 class NewSessionPage extends StatefulWidget {
   const NewSessionPage({
@@ -52,11 +54,18 @@ class _NewSessionPageState
   final SessionService _sessionService =
       SessionService.instance;
 
+  final RuleProfileService _ruleProfileService =
+      RuleProfileService.instance;
+
   //---------------------------------------------------------------------------
   // Etat
   //---------------------------------------------------------------------------
 
   List<SessionPlayer> _players = [];
+
+  List<RuleProfile> _ruleProfiles = [];
+
+  RuleProfile? _selectedRuleProfile;
 
   bool _loading = true;
 
@@ -68,12 +77,19 @@ class _NewSessionPageState
   void initState() {
     super.initState();
 
-    _loadPlayers();
+    _loadData();
   }
 
-  Future<void> _loadPlayers() async {
+  //---------------------------------------------------------------------------
+  // Chargement
+  //---------------------------------------------------------------------------
+
+  Future<void> _loadData() async {
     final players =
         await _playerService.getActive();
+
+    final profiles =
+        _ruleProfileService.getAll();
 
     if (!mounted) {
       return;
@@ -87,6 +103,13 @@ class _NewSessionPageState
             ),
           )
           .toList();
+
+      _ruleProfiles = profiles;
+
+      if (_ruleProfiles.isNotEmpty) {
+        _selectedRuleProfile =
+            _ruleProfiles.first;
+      }
 
       _loading = false;
     });
@@ -126,7 +149,7 @@ class _NewSessionPageState
 
     _sessionService.start(
       ruleProfile:
-          OfficialRuleProfiles.fft(),
+          _selectedRuleProfile!,
       players: result.players,
       firstDealerPosition:
           result.firstDealerPosition,
@@ -147,6 +170,7 @@ class _NewSessionPageState
   //---------------------------------------------------------------------------
 
   bool get _canCreate =>
+      _selectedRuleProfile != null &&
       _players
               .where((p) => p.selected)
               .length >=
@@ -167,20 +191,65 @@ class _NewSessionPageState
             )
           : ListView(
               children: [
+                //----------------------------------------------------------------
+                // Profil de règles
+                //----------------------------------------------------------------
+
                 AppSection(
                   title: 'Profil de règles',
                   child: AppCard(
-                    child: Text(
-                      OfficialRuleProfiles
-                          .fft()
-                          .name,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.all(
+                        AppSpacing.md,
+                      ),
+                      child:
+                          DropdownButtonFormField<
+                              RuleProfile>(
+                        value:
+                            _selectedRuleProfile,
+
+                        decoration:
+                            const InputDecoration(
+                          labelText:
+                              'Profil',
+                        ),
+
+                        items: _ruleProfiles
+                            .map(
+                              (profile) =>
+                                  DropdownMenuItem<
+                                      RuleProfile>(
+                                value: profile,
+                                child: Text(
+                                  profile
+                                      .displayName,
+                                ),
+                              ),
+                            )
+                            .toList(),
+
+                        onChanged: (
+                          profile,
+                        ) {
+                          setState(() {
+                            _selectedRuleProfile =
+                                profile;
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ),
 
+                //----------------------------------------------------------------
+                // Joueurs
+                //----------------------------------------------------------------
+
                 AppSection(
                   title: 'Joueurs',
-                  child: PlayerSelectionCard(
+                  child:
+                      PlayerSelectionCard(
                     players: _players,
                     onChanged: _refresh,
                   ),
@@ -189,6 +258,10 @@ class _NewSessionPageState
                 const SizedBox(
                   height: AppSpacing.xl,
                 ),
+
+                //----------------------------------------------------------------
+                // Suivant
+                //----------------------------------------------------------------
 
                 AppButton(
                   label: 'Suivant',

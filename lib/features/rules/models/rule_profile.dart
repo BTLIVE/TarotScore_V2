@@ -10,6 +10,7 @@
 
 import 'bonus_rule.dart';
 import 'contract_rule.dart';
+import 'penalty_rule.dart';
 
 class RuleProfile {
   //---------------------------------------------------------------------------
@@ -48,13 +49,13 @@ class RuleProfile {
   /// Bonus disponibles.
   final List<BonusRule> bonuses;
 
+  /// Pénalités disponibles.
+  final List<PenaltyRule> penalties;
+
   /// Nombre de points à réaliser selon le nombre de bouts.
   ///
-  /// Clé :
-  ///   0, 1, 2 ou 3 bouts.
-  ///
-  /// Valeur :
-  ///   Score minimum à atteindre.
+  /// Clé : 0, 1, 2 ou 3 bouts.
+  /// Valeur : score minimum à atteindre.
   final Map<int, int> targetScores;
 
   //---------------------------------------------------------------------------
@@ -70,6 +71,7 @@ class RuleProfile {
     this.active = true,
     this.contracts = const [],
     this.bonuses = const [],
+    this.penalties = const [],
     this.targetScores = const {},
   });
 
@@ -77,9 +79,13 @@ class RuleProfile {
   // Getters
   //---------------------------------------------------------------------------
 
+  /// Nom affiché dans l'interface.
+  String get displayName => name;
+
   /// Contrats actifs triés par ordre.
   List<ContractRule> get enabledContracts {
-    final list = contracts.where((c) => c.enabled).toList();
+    final list =
+        contracts.where((c) => c.enabled).toList();
 
     list.sort(
       (a, b) => a.order.compareTo(b.order),
@@ -90,7 +96,8 @@ class RuleProfile {
 
   /// Bonus actifs triés par ordre.
   List<BonusRule> get enabledBonuses {
-    final list = bonuses.where((b) => b.enabled).toList();
+    final list =
+        bonuses.where((b) => b.enabled).toList();
 
     list.sort(
       (a, b) => a.order.compareTo(b.order),
@@ -99,13 +106,57 @@ class RuleProfile {
     return list;
   }
 
+  /// Pénalités actives triées par ordre.
+  List<PenaltyRule> get enabledPenalties {
+    final list =
+        penalties.where((p) => p.enabled).toList();
+
+    list.sort(
+      (a, b) => a.order.compareTo(b.order),
+    );
+
+    return list;
+  }
+
+  /// Nombre total de contrats.
+  int get contractCount => contracts.length;
+
+  /// Nombre de contrats actifs.
+  int get enabledContractCount =>
+      enabledContracts.length;
+
+  /// Nombre total de bonus.
+  int get bonusCount => bonuses.length;
+
+  /// Nombre de bonus actifs.
+  int get enabledBonusCount =>
+      enabledBonuses.length;
+
+  /// Nombre total de pénalités.
+  int get penaltyCount => penalties.length;
+
+  /// Nombre de pénalités actives.
+  int get enabledPenaltyCount =>
+      enabledPenalties.length;
+
+  /// Résumé du profil.
+  String get summary =>
+      '$enabledContractCount contrat'
+      '${enabledContractCount > 1 ? 's' : ''}'
+      ' • '
+      '$enabledBonusCount bonus';
+
+  /// Le profil est modifiable.
+  bool get isEditable => !official;
+
+  /// Le profil peut être supprimé.
+  bool get isDeletable => !official;
+
   //---------------------------------------------------------------------------
   // Recherche
   //---------------------------------------------------------------------------
 
   /// Retourne un contrat à partir de son identifiant.
-  ///
-  /// Renvoie null si le contrat n'existe pas.
   ContractRule? contract(String id) {
     for (final contract in contracts) {
       if (contract.id == id) {
@@ -117,8 +168,6 @@ class RuleProfile {
   }
 
   /// Retourne un bonus à partir de son identifiant.
-  ///
-  /// Renvoie null si le bonus n'existe pas.
   BonusRule? bonus(String id) {
     for (final bonus in bonuses) {
       if (bonus.id == id) {
@@ -129,11 +178,80 @@ class RuleProfile {
     return null;
   }
 
+  /// Retourne une pénalité à partir de son identifiant.
+  PenaltyRule? penalty(String id) {
+    for (final penalty in penalties) {
+      if (penalty.id == id) {
+        return penalty;
+      }
+    }
+
+    return null;
+  }
+
   /// Retourne le score minimum à atteindre selon le nombre de bouts.
-  ///
-  /// Renvoie null si le nombre de bouts est invalide.
   int? targetScore(int oudlers) {
     return targetScores[oudlers];
+  }
+
+  //---------------------------------------------------------------------------
+  // Mise à jour
+  //---------------------------------------------------------------------------
+
+  /// Met à jour un contrat du profil.
+  RuleProfile updateContract(
+    ContractRule contract,
+  ) {
+    final updatedContracts =
+        contracts
+            .map(
+              (item) => item.id == contract.id
+                  ? contract
+                  : item,
+            )
+            .toList();
+
+    return copyWith(
+      contracts: updatedContracts,
+    );
+  }
+
+  /// Met à jour un bonus du profil.
+  RuleProfile updateBonus(
+    BonusRule bonus,
+  ) {
+    final updatedBonuses =
+        bonuses
+            .map(
+              (item) =>
+                  item.id == bonus.id
+                      ? bonus
+                      : item,
+            )
+            .toList();
+
+    return copyWith(
+      bonuses: updatedBonuses,
+    );
+  }
+
+  /// Met à jour une pénalité du profil.
+  RuleProfile updatePenalty(
+    PenaltyRule penalty,
+  ) {
+    final updatedPenalties =
+        penalties
+            .map(
+              (item) =>
+                  item.id == penalty.id
+                      ? penalty
+                      : item,
+            )
+            .toList();
+
+    return copyWith(
+      penalties: updatedPenalties,
+    );
   }
 
   //---------------------------------------------------------------------------
@@ -149,18 +267,22 @@ class RuleProfile {
     bool? active,
     List<ContractRule>? contracts,
     List<BonusRule>? bonuses,
+    List<PenaltyRule>? penalties,
     Map<int, int>? targetScores,
   }) {
     return RuleProfile(
       uuid: uuid ?? this.uuid,
       name: name ?? this.name,
-      description: description ?? this.description,
+      description:
+          description ?? this.description,
       version: version ?? this.version,
       official: official ?? this.official,
       active: active ?? this.active,
       contracts: contracts ?? this.contracts,
       bonuses: bonuses ?? this.bonuses,
-      targetScores: targetScores ?? this.targetScores,
+      penalties: penalties ?? this.penalties,
+      targetScores:
+          targetScores ?? this.targetScores,
     );
   }
 
@@ -174,7 +296,8 @@ class RuleProfile {
         'name: $name, '
         'version: $version, '
         'contracts: ${contracts.length}, '
-        'bonuses: ${bonuses.length}'
+        'bonuses: ${bonuses.length}, '
+        'penalties: ${penalties.length}'
         ')';
   }
 
@@ -184,9 +307,11 @@ class RuleProfile {
         other is RuleProfile &&
             other.uuid == uuid &&
             other.name == name &&
-            other.description == description &&
+            other.description ==
+                description &&
             other.version == version &&
-            other.official == official &&
+            other.official ==
+                official &&
             other.active == active;
   }
 

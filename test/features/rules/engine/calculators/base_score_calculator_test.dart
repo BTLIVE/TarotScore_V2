@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:tarotscore_v2/features/rules/engine/calculators/base_score_calculator.dart';
 import 'package:tarotscore_v2/features/rules/engine/pipeline/deal_calculation.dart';
+import 'package:tarotscore_v2/features/rules/engine/pipeline/deal_context.dart';
 import 'package:tarotscore_v2/features/rules/factories/official_rule_profiles.dart';
 import 'package:tarotscore_v2/features/sessions/models/deal.dart';
 
@@ -26,7 +27,16 @@ void main() {
 
     return DealCalculation(
       profile: profile,
-      playerCount: 4,
+      context: const DealContext(
+        activePlayerPositions: [
+          0,
+          1,
+          2,
+          3,
+        ],
+        deadPlayerPositions: [],
+        dealerPosition: 0,
+      ),
       deal: deal,
     );
   }

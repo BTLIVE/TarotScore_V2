@@ -14,4 +14,7 @@ class AppRoutes {
   static const settings = '/settings';
 
   static const about = '/about';
+
+  static const ruleProfiles = '/rule-profiles';
+  
 }
