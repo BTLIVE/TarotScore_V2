@@ -19,10 +19,7 @@ import '../../../../core/widgets/app_card.dart';
 class ProfileActionsCard extends StatelessWidget {
   const ProfileActionsCard({
     super.key,
-    required this.isEditable,
-    required this.isDeletable,
     required this.onSave,
-    required this.onDuplicate,
     required this.onDelete,
   });
 
@@ -30,13 +27,7 @@ class ProfileActionsCard extends StatelessWidget {
   // Paramètres
   //---------------------------------------------------------------------------
 
-  final bool isEditable;
-
-  final bool isDeletable;
-
   final VoidCallback? onSave;
-
-  final VoidCallback? onDuplicate;
 
   final VoidCallback? onDelete;
 
@@ -53,8 +44,7 @@ class ProfileActionsCard extends StatelessWidget {
         children: [
           AppButton(
             label: 'Enregistrer',
-            onPressed:
-                isEditable ? onSave : null,
+            onPressed: onSave,
           ),
 
           const SizedBox(
@@ -62,20 +52,9 @@ class ProfileActionsCard extends StatelessWidget {
           ),
 
           AppButton(
-            label: 'Dupliquer',
-            onPressed: onDuplicate,
+            label: 'Supprimer',
+            onPressed: onDelete,
           ),
-
-          if (isDeletable) ...[
-            const SizedBox(
-              height: AppSpacing.md,
-            ),
-
-            AppButton(
-              label: 'Supprimer',
-              onPressed: onDelete,
-            ),
-          ],
         ],
       ),
     );

@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_switch_tile.dart';
 import '../../../../core/widgets/app_text_field.dart';
 
 import '../../models/rule_profile.dart';
@@ -113,8 +112,6 @@ class _ProfileInformationCardState
           AppTextField(
             controller: _nameController,
             label: 'Nom',
-            enabled:
-                widget.profile.isEditable,
             onChanged: (_) => _notify(),
           ),
 
@@ -127,8 +124,6 @@ class _ProfileInformationCardState
                 _descriptionController,
             label: 'Description',
             maxLines: 2,
-            enabled:
-                widget.profile.isEditable,
             onChanged: (_) => _notify(),
           ),
 
@@ -140,37 +135,7 @@ class _ProfileInformationCardState
             controller:
                 _versionController,
             label: 'Version',
-            enabled:
-                widget.profile.isEditable,
             onChanged: (_) => _notify(),
-          ),
-
-          const SizedBox(
-            height: AppSpacing.md,
-          ),
-
-          AppSwitchTile(
-            title: 'Profil actif',
-            value: widget.profile.active,
-            onChanged:
-                widget.profile.isEditable
-                    ? (value) {
-                        widget.onChanged(
-                          widget.profile
-                              .copyWith(
-                            active: value,
-                          ),
-                        );
-                      }
-                    : null,
-          ),
-
-          AppSwitchTile(
-            title: 'Profil officiel',
-            subtitle: 'Lecture seule',
-            value:
-                widget.profile.official,
-            onChanged: null,
           ),
         ],
       ),

@@ -17,7 +17,6 @@ import '../../../../core/widgets/app_card.dart';
 
 import '../../models/bonus_rule.dart';
 import '../../models/rule_profile.dart';
-
 import 'rule_value_field.dart';
 
 class ProfileBonusesCard extends StatelessWidget {
@@ -59,82 +58,45 @@ class ProfileBonusesCard extends StatelessWidget {
                 if (index > 0)
                   const Divider(height: 1),
 
+                CheckboxListTile(
+                  value: bonus.enabled,
+                  controlAffinity:
+                      ListTileControlAffinity.leading,
+                  title: Text(bonus.name),
+                  onChanged: (value) {
+                    final updated =
+                        bonus.copyWith(
+                      enabled: value ?? false,
+                    );
+
+                    onChanged(
+                      profile.updateBonus(updated),
+                    );
+                  },
+                ),
+
                 Padding(
-                  padding: const EdgeInsets.all(
-                    AppSpacing.md,
+                  padding:
+                      const EdgeInsets.only(
+                    left: AppSpacing.xl,
+                    right: AppSpacing.lg,
+                    bottom: AppSpacing.md,
                   ),
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      CheckboxListTile(
-                        contentPadding:
-                            EdgeInsets.zero,
+                  child: RuleValueField(
+                    label: 'Valeur',
+                    value: bonus.value,
+                    onChanged: (value) {
+                      final updated =
+                          bonus.copyWith(
+                        value: value,
+                      );
 
-                        controlAffinity:
-                            ListTileControlAffinity.leading,
-
-                        value: bonus.enabled,
-
-                        title: Text(
-                          bonus.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium,
+                      onChanged(
+                        profile.updateBonus(
+                          updated,
                         ),
-
-                        onChanged: profile.isEditable
-                            ? (value) {
-                                final updated =
-                                    bonus.copyWith(
-                                  enabled:
-                                      value ??
-                                          false,
-                                );
-
-                                onChanged(
-                                  profile.updateBonus(
-                                    updated,
-                                  ),
-                                );
-                              }
-                            : null,
-                      ),
-
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(
-                          left: AppSpacing.xl,
-                          right: AppSpacing.sm,
-                        ),
-                        child: RuleValueField(
-                          label: 'Valeur',
-
-                          value: bonus.value,
-
-                          min: 0,
-
-                          max: 500,
-
-                          onChanged:
-                              profile.isEditable
-                                  ? (value) {
-                                      final updated =
-                                          bonus.copyWith(
-                                        value: value,
-                                      );
-
-                                      onChanged(
-                                        profile
-                                            .updateBonus(
-                                          updated,
-                                        ),
-                                      );
-                                    }
-                                  : (_) {},
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],

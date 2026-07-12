@@ -123,10 +123,6 @@ class _RuleProfilesPageState
           AppSpacing.lg,
         ),
         children: [
-          //------------------------------------------------------------------
-          // Profils
-          //------------------------------------------------------------------
-
           AppSection(
             title: 'Profils disponibles',
             child: AppCard(
@@ -154,10 +150,8 @@ class _RuleProfilesPageState
                                 ),
 
                               ListTile(
-                                leading: Icon(
-                                  profile.official
-                                      ? Icons.lock
-                                      : Icons.person,
+                                leading: const Icon(
+                                  Icons.rule,
                                 ),
 
                                 title: Text(
@@ -189,10 +183,6 @@ class _RuleProfilesPageState
           const SizedBox(
             height: AppSpacing.xl,
           ),
-
-          //------------------------------------------------------------------
-          // Nouveau profil
-          //------------------------------------------------------------------
 
           AppButton(
             label: 'Nouveau profil',

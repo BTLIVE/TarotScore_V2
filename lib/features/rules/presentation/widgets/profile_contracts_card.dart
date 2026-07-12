@@ -17,7 +17,6 @@ import '../../../../core/widgets/app_card.dart';
 
 import '../../models/contract_rule.dart';
 import '../../models/rule_profile.dart';
-
 import 'rule_value_field.dart';
 
 class ProfileContractsCard extends StatelessWidget {
@@ -44,7 +43,8 @@ class ProfileContractsCard extends StatelessWidget {
     final contracts = List<ContractRule>.from(
       profile.contracts,
     )..sort(
-        (a, b) => a.order.compareTo(b.order),
+        (a, b) =>
+            a.order.compareTo(b.order),
       );
 
     return AppCard(
@@ -52,92 +52,61 @@ class ProfileContractsCard extends StatelessWidget {
         children: List.generate(
           contracts.length,
           (index) {
-            final contract = contracts[index];
+            final contract =
+                contracts[index];
 
             return Column(
               children: [
                 if (index > 0)
                   const Divider(height: 1),
 
+                CheckboxListTile(
+                  value: contract.enabled,
+
+                  title: Text(contract.name),
+
+                  controlAffinity:
+                      ListTileControlAffinity
+                          .leading,
+
+                  onChanged: (value) {
+                    final updated =
+                        contract.copyWith(
+                      enabled:
+                          value ?? false,
+                    );
+
+                    onChanged(
+                      profile.updateContract(
+                        updated,
+                      ),
+                    );
+                  },
+                ),
+
                 Padding(
-                  padding: const EdgeInsets.all(
-                    AppSpacing.md,
+                  padding:
+                      const EdgeInsets.only(
+                    left: AppSpacing.xl,
+                    right: AppSpacing.lg,
+                    bottom: AppSpacing.md,
                   ),
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      CheckboxListTile(
-                        contentPadding:
-                            EdgeInsets.zero,
+                  child: RuleValueField(
+                    label: 'Multiplicateur',
+                    value:
+                        contract.multiplier,
+                    onChanged: (value) {
+                      final updated =
+                          contract.copyWith(
+                        multiplier: value,
+                      );
 
-                        controlAffinity:
-                            ListTileControlAffinity.leading,
-
-                        value: contract.enabled,
-
-                        title: Text(
-                          contract.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium,
+                      onChanged(
+                        profile.updateContract(
+                          updated,
                         ),
-
-                        onChanged: profile.isEditable
-                            ? (value) {
-                                final updated =
-                                    contract.copyWith(
-                                  enabled:
-                                      value ??
-                                          false,
-                                );
-
-                                onChanged(
-                                  profile.updateContract(
-                                    updated,
-                                  ),
-                                );
-                              }
-                            : null,
-                      ),
-
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(
-                          left: AppSpacing.xl,
-                          right: AppSpacing.sm,
-                        ),
-                        child: RuleValueField(
-                          label:
-                              'Multiplicateur',
-
-                          value:
-                              contract.multiplier,
-
-                          min: 1,
-
-                          max: 20,
-
-                          onChanged:
-                              profile.isEditable
-                                  ? (value) {
-                                      final updated =
-                                          contract.copyWith(
-                                        multiplier:
-                                            value,
-                                      );
-
-                                      onChanged(
-                                        profile
-                                            .updateContract(
-                                          updated,
-                                        ),
-                                      );
-                                    }
-                                  : (_) {},
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],

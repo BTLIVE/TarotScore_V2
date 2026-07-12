@@ -30,16 +30,6 @@ class RuleProfile {
   final String version;
 
   //---------------------------------------------------------------------------
-  // Configuration
-  //---------------------------------------------------------------------------
-
-  /// Profil officiel fourni par TarotScore.
-  final bool official;
-
-  /// Profil actif.
-  final bool active;
-
-  //---------------------------------------------------------------------------
   // Règles
   //---------------------------------------------------------------------------
 
@@ -67,8 +57,6 @@ class RuleProfile {
     required this.name,
     required this.description,
     required this.version,
-    this.official = false,
-    this.active = true,
     this.contracts = const [],
     this.bonuses = const [],
     this.penalties = const [],
@@ -146,17 +134,10 @@ class RuleProfile {
       ' • '
       '$enabledBonusCount bonus';
 
-  /// Le profil est modifiable.
-  bool get isEditable => !official;
-
-  /// Le profil peut être supprimé.
-  bool get isDeletable => !official;
-
   //---------------------------------------------------------------------------
   // Recherche
   //---------------------------------------------------------------------------
 
-  /// Retourne un contrat à partir de son identifiant.
   ContractRule? contract(String id) {
     for (final contract in contracts) {
       if (contract.id == id) {
@@ -167,7 +148,6 @@ class RuleProfile {
     return null;
   }
 
-  /// Retourne un bonus à partir de son identifiant.
   BonusRule? bonus(String id) {
     for (final bonus in bonuses) {
       if (bonus.id == id) {
@@ -178,7 +158,6 @@ class RuleProfile {
     return null;
   }
 
-  /// Retourne une pénalité à partir de son identifiant.
   PenaltyRule? penalty(String id) {
     for (final penalty in penalties) {
       if (penalty.id == id) {
@@ -189,7 +168,6 @@ class RuleProfile {
     return null;
   }
 
-  /// Retourne le score minimum à atteindre selon le nombre de bouts.
   int? targetScore(int oudlers) {
     return targetScores[oudlers];
   }
@@ -198,7 +176,6 @@ class RuleProfile {
   // Mise à jour
   //---------------------------------------------------------------------------
 
-  /// Met à jour un contrat du profil.
   RuleProfile updateContract(
     ContractRule contract,
   ) {
@@ -216,7 +193,6 @@ class RuleProfile {
     );
   }
 
-  /// Met à jour un bonus du profil.
   RuleProfile updateBonus(
     BonusRule bonus,
   ) {
@@ -235,7 +211,6 @@ class RuleProfile {
     );
   }
 
-  /// Met à jour une pénalité du profil.
   RuleProfile updatePenalty(
     PenaltyRule penalty,
   ) {
@@ -263,8 +238,6 @@ class RuleProfile {
     String? name,
     String? description,
     String? version,
-    bool? official,
-    bool? active,
     List<ContractRule>? contracts,
     List<BonusRule>? bonuses,
     List<PenaltyRule>? penalties,
@@ -276,8 +249,6 @@ class RuleProfile {
       description:
           description ?? this.description,
       version: version ?? this.version,
-      official: official ?? this.official,
-      active: active ?? this.active,
       contracts: contracts ?? this.contracts,
       bonuses: bonuses ?? this.bonuses,
       penalties: penalties ?? this.penalties,
@@ -307,23 +278,15 @@ class RuleProfile {
         other is RuleProfile &&
             other.uuid == uuid &&
             other.name == name &&
-            other.description ==
-                description &&
-            other.version == version &&
-            other.official ==
-                official &&
-            other.active == active;
+            other.description == description &&
+            other.version == version;
   }
 
   @override
-  int get hashCode {
-    return Object.hash(
-      uuid,
-      name,
-      description,
-      version,
-      official,
-      active,
-    );
-  }
+  int get hashCode => Object.hash(
+        uuid,
+        name,
+        description,
+        version,
+      );
 }

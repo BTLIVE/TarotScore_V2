@@ -44,7 +44,7 @@ class PenaltyRule {
   const PenaltyRule({
     required this.id,
     required this.name,
-    required this.description,
+    this.description = '',
     required this.order,
     this.enabled = true,
     required this.value,
@@ -65,8 +65,7 @@ class PenaltyRule {
     return PenaltyRule(
       id: id ?? this.id,
       name: name ?? this.name,
-      description:
-          description ?? this.description,
+      description: description ?? this.description,
       order: order ?? this.order,
       enabled: enabled ?? this.enabled,
       value: value ?? this.value,
@@ -98,4 +97,14 @@ class PenaltyRule {
         enabled,
         value,
       );
+
+  @override
+  String toString() {
+    return 'PenaltyRule('
+        'id: $id, '
+        'name: $name, '
+        'value: $value, '
+        'enabled: $enabled'
+        ')';
+  }
 }

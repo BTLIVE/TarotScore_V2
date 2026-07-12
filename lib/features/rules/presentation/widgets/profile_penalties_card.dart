@@ -17,7 +17,6 @@ import '../../../../core/widgets/app_card.dart';
 
 import '../../models/penalty_rule.dart';
 import '../../models/rule_profile.dart';
-
 import 'rule_value_field.dart';
 
 class ProfilePenaltiesCard extends StatelessWidget {
@@ -59,82 +58,52 @@ class ProfilePenaltiesCard extends StatelessWidget {
                 if (index > 0)
                   const Divider(height: 1),
 
-                Padding(
-                  padding: const EdgeInsets.all(
-                    AppSpacing.md,
+                CheckboxListTile(
+                  value: penalty.enabled,
+
+                  controlAffinity:
+                      ListTileControlAffinity.leading,
+
+                  title: Text(
+                    penalty.name,
                   ),
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      CheckboxListTile(
-                        contentPadding:
-                            EdgeInsets.zero,
 
-                        controlAffinity:
-                            ListTileControlAffinity.leading,
+                  onChanged: (value) {
+                    final updated =
+                        penalty.copyWith(
+                      enabled: value ?? false,
+                    );
 
-                        value: penalty.enabled,
-
-                        title: Text(
-                          penalty.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium,
-                        ),
-
-                        onChanged: profile.isEditable
-                            ? (value) {
-                                final updated =
-                                    penalty.copyWith(
-                                  enabled:
-                                      value ??
-                                          false,
-                                );
-
-                                onChanged(
-                                  profile.updatePenalty(
-                                    updated,
-                                  ),
-                                );
-                              }
-                            : null,
+                    onChanged(
+                      profile.updatePenalty(
+                        updated,
                       ),
+                    );
+                  },
+                ),
 
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(
-                          left: AppSpacing.xl,
-                          right: AppSpacing.sm,
+                Padding(
+                  padding:
+                      const EdgeInsets.only(
+                    left: AppSpacing.xl,
+                    right: AppSpacing.lg,
+                    bottom: AppSpacing.md,
+                  ),
+                  child: RuleValueField(
+                    label: 'Valeur',
+                    value: penalty.value,
+                    onChanged: (value) {
+                      final updated =
+                          penalty.copyWith(
+                        value: value,
+                      );
+
+                      onChanged(
+                        profile.updatePenalty(
+                          updated,
                         ),
-                        child: RuleValueField(
-                          label: 'Valeur',
-
-                          value: penalty.value,
-
-                          min: 0,
-
-                          max: 500,
-
-                          onChanged:
-                              profile.isEditable
-                                  ? (value) {
-                                      final updated =
-                                          penalty.copyWith(
-                                        value: value,
-                                      );
-
-                                      onChanged(
-                                        profile
-                                            .updatePenalty(
-                                          updated,
-                                        ),
-                                      );
-                                    }
-                                  : (_) {},
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],

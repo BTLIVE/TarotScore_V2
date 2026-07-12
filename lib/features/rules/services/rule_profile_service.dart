@@ -10,9 +10,7 @@
 //
 // ***************************************************************************
 
-import 'package:uuid/uuid.dart';
-
-import '../factories/official_rule_profiles.dart';
+import '../factories/rule_profile_factory.dart';
 import '../models/rule_profile.dart';
 
 class RuleProfileService {
@@ -29,9 +27,7 @@ class RuleProfileService {
   // Données
   //---------------------------------------------------------------------------
 
-  final List<RuleProfile> _profiles = [
-    OfficialRuleProfiles.fft(),
-  ];
+  final List<RuleProfile> _profiles = [];
 
   //---------------------------------------------------------------------------
   // Lecture
@@ -54,24 +50,12 @@ class RuleProfileService {
     return null;
   }
 
-  /// Alias conservé pour compatibilité avec le code existant.
+  /// Alias temporaire conservé pour compatibilité
+  /// avec le sérialiseur actuel.
   RuleProfile? getByUuid(
     String uuid,
   ) {
     return get(uuid);
-  }
-
-  //---------------------------------------------------------------------------
-  // Initialisation
-  //---------------------------------------------------------------------------
-
-  /// Remplace complètement la liste des profils.
-  void replaceAll(
-    Iterable<RuleProfile> profiles,
-  ) {
-    _profiles
-      ..clear()
-      ..addAll(profiles);
   }
 
   //---------------------------------------------------------------------------
@@ -80,29 +64,23 @@ class RuleProfileService {
 
   /// Crée un nouveau profil.
   ///
-  /// Le profil n'est pas ajouté automatiquement.
+  /// Le profil n'est pas enregistré automatiquement.
   RuleProfile create() {
-    return RuleProfile(
-      uuid: const Uuid().v4(),
+    return RuleProfileFactory.create(
       name: 'Nouveau profil',
-      description: '',
-      version: '1.0',
-      official: false,
-      active: true,
     );
   }
 
   //---------------------------------------------------------------------------
-  // Écriture
+  // Sauvegarde
   //---------------------------------------------------------------------------
 
-  /// Enregistre un profil.
+  /// Ajoute ou met à jour un profil.
   void save(
     RuleProfile profile,
   ) {
     final index = _profiles.indexWhere(
-      (element) =>
-          element.uuid == profile.uuid,
+      (item) => item.uuid == profile.uuid,
     );
 
     if (index >= 0) {
@@ -111,6 +89,10 @@ class RuleProfileService {
       _profiles.add(profile);
     }
   }
+
+  //---------------------------------------------------------------------------
+  // Suppression
+  //---------------------------------------------------------------------------
 
   /// Supprime un profil.
   void delete(
@@ -122,21 +104,17 @@ class RuleProfileService {
   }
 
   //---------------------------------------------------------------------------
-  // Duplication
+  // Initialisation / Restauration
   //---------------------------------------------------------------------------
 
-  /// Duplique un profil.
-  RuleProfile duplicate(
-    RuleProfile profile,
+  /// Remplace complètement la liste des profils.
+  ///
+  /// Utilisé lors du chargement depuis le stockage.
+  void replaceAll(
+    Iterable<RuleProfile> profiles,
   ) {
-    final copy = profile.copyWith(
-      uuid: const Uuid().v4(),
-      name: '${profile.name} (copie)',
-      official: false,
-    );
-
-    _profiles.add(copy);
-
-    return copy;
+    _profiles
+      ..clear()
+      ..addAll(profiles);
   }
 }

@@ -74,12 +74,6 @@ class _RuleProfileEditorPageState
     Navigator.pop(context);
   }
 
-  void _duplicate() {
-    _service.duplicate(_profile);
-
-    Navigator.pop(context);
-  }
-
   void _delete() {
     _service.delete(_profile.uuid);
 
@@ -99,10 +93,6 @@ class _RuleProfileEditorPageState
           AppSpacing.lg,
         ),
         children: [
-          //------------------------------------------------------------------
-          // Informations
-          //------------------------------------------------------------------
-
           ProfileInformationCard(
             profile: _profile,
             onChanged: (profile) {
@@ -115,10 +105,6 @@ class _RuleProfileEditorPageState
           const SizedBox(
             height: AppSpacing.lg,
           ),
-
-          //------------------------------------------------------------------
-          // Contrats
-          //------------------------------------------------------------------
 
           ProfileContractsCard(
             profile: _profile,
@@ -133,10 +119,6 @@ class _RuleProfileEditorPageState
             height: AppSpacing.lg,
           ),
 
-          //------------------------------------------------------------------
-          // Bonus
-          //------------------------------------------------------------------
-
           ProfileBonusesCard(
             profile: _profile,
             onChanged: (profile) {
@@ -149,10 +131,6 @@ class _RuleProfileEditorPageState
           const SizedBox(
             height: AppSpacing.lg,
           ),
-
-          //------------------------------------------------------------------
-          // Pénalités
-          //------------------------------------------------------------------
 
           ProfilePenaltiesCard(
             profile: _profile,
@@ -167,10 +145,6 @@ class _RuleProfileEditorPageState
             height: AppSpacing.lg,
           ),
 
-          //------------------------------------------------------------------
-          // Calcul
-          //------------------------------------------------------------------
-
           ProfileCalculationCard(
             profile: _profile,
             onChanged: (profile) {
@@ -184,15 +158,8 @@ class _RuleProfileEditorPageState
             height: AppSpacing.lg,
           ),
 
-          //------------------------------------------------------------------
-          // Actions
-          //------------------------------------------------------------------
-
           ProfileActionsCard(
-            isEditable: _profile.isEditable,
-            isDeletable: _profile.isDeletable,
             onSave: _save,
-            onDuplicate: _duplicate,
             onDelete: _delete,
           ),
         ],
