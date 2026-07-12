@@ -60,22 +60,30 @@ class OfficialRuleProfiles {
           multiplier: 1,
           order: 1,
         ),
+        
+        ContractRule(
+          id: 'pousse',
+          name: 'Pousse',
+          multiplier: 2,
+          order: 2,
+      ),
+      
         ContractRule(
           id: 'garde',
           name: 'Garde',
-          multiplier: 2,
+          multiplier: 4,
           order: 2,
         ),
         ContractRule(
           id: 'garde_sans',
           name: 'Garde Sans',
-          multiplier: 4,
+          multiplier: 6,
           order: 3,
         ),
         ContractRule(
           id: 'garde_contre',
           name: 'Garde Contre',
-          multiplier: 6,
+          multiplier: 8,
           order: 4,
         ),
       ],

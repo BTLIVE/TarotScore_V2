@@ -18,6 +18,8 @@ import '../../../../core/widgets/app_card.dart';
 import '../../models/bonus_rule.dart';
 import '../../models/rule_profile.dart';
 
+import 'rule_value_field.dart';
+
 class ProfileBonusesCard extends StatelessWidget {
   const ProfileBonusesCard({
     super.key,
@@ -55,63 +57,82 @@ class ProfileBonusesCard extends StatelessWidget {
             return Column(
               children: [
                 if (index > 0)
-                  const Divider(
-                    height: 1,
-                  ),
-
-                CheckboxListTile(
-                  value: bonus.enabled,
-
-                  controlAffinity:
-                      ListTileControlAffinity.leading,
-
-                  title: Text(
-                    bonus.name,
-                  ),
-
-                  subtitle: Text(
-                    'Valeur : ${bonus.value}',
-                  ),
-
-                  onChanged: (value) {
-                    final updated =
-                        bonus.copyWith(
-                      enabled:
-                          value ?? false,
-                    );
-
-                    onChanged(
-                      profile.updateBonus(
-                        updated,
-                      ),
-                    );
-                  },
-                ),
+                  const Divider(height: 1),
 
                 Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    left: AppSpacing.xl,
-                    right: AppSpacing.lg,
-                    bottom: AppSpacing.md,
+                  padding: const EdgeInsets.all(
+                    AppSpacing.md,
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.stars,
-                        size: 18,
+                      CheckboxListTile(
+                        contentPadding:
+                            EdgeInsets.zero,
+
+                        controlAffinity:
+                            ListTileControlAffinity.leading,
+
+                        value: bonus.enabled,
+
+                        title: Text(
+                          bonus.name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium,
+                        ),
+
+                        onChanged: profile.isEditable
+                            ? (value) {
+                                final updated =
+                                    bonus.copyWith(
+                                  enabled:
+                                      value ??
+                                          false,
+                                );
+
+                                onChanged(
+                                  profile.updateBonus(
+                                    updated,
+                                  ),
+                                );
+                              }
+                            : null,
                       ),
 
-                      const SizedBox(
-                        width:
-                            AppSpacing.sm,
-                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(
+                          left: AppSpacing.xl,
+                          right: AppSpacing.sm,
+                        ),
+                        child: RuleValueField(
+                          label: 'Valeur',
 
-                      Text(
-                        'Valeur : ${bonus.value}',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodySmall,
+                          value: bonus.value,
+
+                          min: 0,
+
+                          max: 500,
+
+                          onChanged:
+                              profile.isEditable
+                                  ? (value) {
+                                      final updated =
+                                          bonus.copyWith(
+                                        value: value,
+                                      );
+
+                                      onChanged(
+                                        profile
+                                            .updateBonus(
+                                          updated,
+                                        ),
+                                      );
+                                    }
+                                  : (_) {},
+                        ),
                       ),
                     ],
                   ),

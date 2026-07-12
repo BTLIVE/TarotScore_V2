@@ -18,6 +18,8 @@ import '../../../../core/widgets/app_card.dart';
 import '../../models/penalty_rule.dart';
 import '../../models/rule_profile.dart';
 
+import 'rule_value_field.dart';
+
 class ProfilePenaltiesCard extends StatelessWidget {
   const ProfilePenaltiesCard({
     super.key,
@@ -50,70 +52,87 @@ class ProfilePenaltiesCard extends StatelessWidget {
         children: List.generate(
           penalties.length,
           (index) {
-            final penalty =
-                penalties[index];
+            final penalty = penalties[index];
 
             return Column(
               children: [
                 if (index > 0)
-                  const Divider(
-                    height: 1,
-                  ),
-
-                CheckboxListTile(
-                  value: penalty.enabled,
-
-                  controlAffinity:
-                      ListTileControlAffinity
-                          .leading,
-
-                  title: Text(
-                    penalty.name,
-                  ),
-
-                  subtitle: Text(
-                    'Valeur : ${penalty.value}',
-                  ),
-
-                  onChanged: (value) {
-                    final updated =
-                        penalty.copyWith(
-                      enabled:
-                          value ?? false,
-                    );
-
-                    onChanged(
-                      profile.updatePenalty(
-                        updated,
-                      ),
-                    );
-                  },
-                ),
+                  const Divider(height: 1),
 
                 Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    left: AppSpacing.xl,
-                    right: AppSpacing.lg,
-                    bottom: AppSpacing.md,
+                  padding: const EdgeInsets.all(
+                    AppSpacing.md,
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.warning_amber,
-                        size: 18,
+                      CheckboxListTile(
+                        contentPadding:
+                            EdgeInsets.zero,
+
+                        controlAffinity:
+                            ListTileControlAffinity.leading,
+
+                        value: penalty.enabled,
+
+                        title: Text(
+                          penalty.name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium,
+                        ),
+
+                        onChanged: profile.isEditable
+                            ? (value) {
+                                final updated =
+                                    penalty.copyWith(
+                                  enabled:
+                                      value ??
+                                          false,
+                                );
+
+                                onChanged(
+                                  profile.updatePenalty(
+                                    updated,
+                                  ),
+                                );
+                              }
+                            : null,
                       ),
 
-                      const SizedBox(
-                        width:
-                            AppSpacing.sm,
-                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(
+                          left: AppSpacing.xl,
+                          right: AppSpacing.sm,
+                        ),
+                        child: RuleValueField(
+                          label: 'Valeur',
 
-                      Text(
-                        'Valeur : ${penalty.value}',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodySmall,
+                          value: penalty.value,
+
+                          min: 0,
+
+                          max: 500,
+
+                          onChanged:
+                              profile.isEditable
+                                  ? (value) {
+                                      final updated =
+                                          penalty.copyWith(
+                                        value: value,
+                                      );
+
+                                      onChanged(
+                                        profile
+                                            .updatePenalty(
+                                          updated,
+                                        ),
+                                      );
+                                    }
+                                  : (_) {},
+                        ),
                       ),
                     ],
                   ),

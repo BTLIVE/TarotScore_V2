@@ -18,6 +18,8 @@ import '../../../../core/widgets/app_card.dart';
 import '../../models/contract_rule.dart';
 import '../../models/rule_profile.dart';
 
+import 'rule_value_field.dart';
+
 class ProfileContractsCard extends StatelessWidget {
   const ProfileContractsCard({
     super.key,
@@ -42,8 +44,7 @@ class ProfileContractsCard extends StatelessWidget {
     final contracts = List<ContractRule>.from(
       profile.contracts,
     )..sort(
-        (a, b) =>
-            a.order.compareTo(b.order),
+        (a, b) => a.order.compareTo(b.order),
       );
 
     return AppCard(
@@ -51,82 +52,90 @@ class ProfileContractsCard extends StatelessWidget {
         children: List.generate(
           contracts.length,
           (index) {
-            final contract =
-                contracts[index];
+            final contract = contracts[index];
 
             return Column(
               children: [
                 if (index > 0)
                   const Divider(height: 1),
 
-                CheckboxListTile(
-                  value: contract.enabled,
-
-                  title: Text(
-                    contract.name,
-                  ),
-
-                  subtitle: Text(
-                    'Multiplicateur : '
-                    '${contract.multiplier}',
-                  ),
-
-                  controlAffinity:
-                      ListTileControlAffinity
-                          .leading,
-
-                  onChanged: (value) {
-                    final updated =
-                        contract.copyWith(
-                      enabled:
-                          value ?? false,
-                    );
-
-                    final newContracts =
-                        contracts
-                            .map(
-                              (item) =>
-                                  item.id ==
-                                          updated.id
-                                      ? updated
-                                      : item,
-                            )
-                            .toList();
-
-                    onChanged(
-                      profile.copyWith(
-                        contracts:
-                            newContracts,
-                      ),
-                    );
-                  },
-                ),
-
                 Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    left: AppSpacing.xl,
-                    right: AppSpacing.lg,
-                    bottom: AppSpacing.md,
+                  padding: const EdgeInsets.all(
+                    AppSpacing.md,
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.calculate,
-                        size: 18,
+                      CheckboxListTile(
+                        contentPadding:
+                            EdgeInsets.zero,
+
+                        controlAffinity:
+                            ListTileControlAffinity.leading,
+
+                        value: contract.enabled,
+
+                        title: Text(
+                          contract.name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium,
+                        ),
+
+                        onChanged: profile.isEditable
+                            ? (value) {
+                                final updated =
+                                    contract.copyWith(
+                                  enabled:
+                                      value ??
+                                          false,
+                                );
+
+                                onChanged(
+                                  profile.updateContract(
+                                    updated,
+                                  ),
+                                );
+                              }
+                            : null,
                       ),
 
-                      const SizedBox(
-                        width:
-                            AppSpacing.sm,
-                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(
+                          left: AppSpacing.xl,
+                          right: AppSpacing.sm,
+                        ),
+                        child: RuleValueField(
+                          label:
+                              'Multiplicateur',
 
-                      Text(
-                        'Multiplicateur : '
-                        '${contract.multiplier}',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodySmall,
+                          value:
+                              contract.multiplier,
+
+                          min: 1,
+
+                          max: 20,
+
+                          onChanged:
+                              profile.isEditable
+                                  ? (value) {
+                                      final updated =
+                                          contract.copyWith(
+                                        multiplier:
+                                            value,
+                                      );
+
+                                      onChanged(
+                                        profile
+                                            .updateContract(
+                                          updated,
+                                        ),
+                                      );
+                                    }
+                                  : (_) {},
+                        ),
                       ),
                     ],
                   ),

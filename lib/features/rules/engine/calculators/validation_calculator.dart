@@ -10,6 +10,8 @@
 //
 // ***************************************************************************
 
+import 'package:flutter/foundation.dart';
+
 import '../../../sessions/models/deal.dart';
 import '../../models/rule_profile.dart';
 import '../exceptions/invalid_deal_exception.dart';
@@ -64,6 +66,40 @@ class ValidationCalculator implements Calculator {
     RuleProfile profile,
     Deal deal,
   ) {
+    //-----------------------------------------------------------------------
+    // Diagnostic temporaire
+    //-----------------------------------------------------------------------
+
+    debugPrint('');
+    debugPrint(
+      '================================================',
+    );
+    debugPrint(
+      'ValidationCalculator',
+    );
+    debugPrint(
+      'Profil            : ${profile.name}',
+    );
+    debugPrint(
+      'Contrat demandé   : ${deal.contractId}',
+    );
+    debugPrint(
+      'Contrats connus   :',
+    );
+
+    for (final contract in profile.contracts) {
+      debugPrint(
+        '  - ${contract.id} (${contract.name}) '
+        'x${contract.multiplier}',
+      );
+    }
+
+    debugPrint(
+      '================================================',
+    );
+
+    //-----------------------------------------------------------------------
+
     final contract = profile.contract(
       deal.contractId,
     );
@@ -141,7 +177,8 @@ class ValidationCalculator implements Calculator {
   void _validateOudlers(
     Deal deal,
   ) {
-    if (deal.oudlers < 0 || deal.oudlers > 3) {
+    if (deal.oudlers < 0 ||
+        deal.oudlers > 3) {
       throw InvalidDealException(
         'Le nombre de bouts doit être compris entre 0 et 3.',
       );
@@ -155,7 +192,8 @@ class ValidationCalculator implements Calculator {
   void _validatePoints(
     Deal deal,
   ) {
-    if (deal.points < 0 || deal.points > 91) {
+    if (deal.points < 0 ||
+        deal.points > 91) {
       throw InvalidDealException(
         'Le nombre de points doit être compris entre 0 et 91.',
       );
