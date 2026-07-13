@@ -31,31 +31,56 @@ class DefaultRuleCatalog {
       ContractRule(
         id: 'petite',
         name: 'Petite',
+
         multiplier: 1,
+
+        baseMultiplier: 1,
+        differenceMultiplier: 1,
+
         order: 1,
       ),
       ContractRule(
         id: 'pousse',
         name: 'Pousse',
+
         multiplier: 2,
+
+        baseMultiplier: 2,
+        differenceMultiplier: 2,
+
         order: 2,
       ),
       ContractRule(
         id: 'garde',
         name: 'Garde',
+
         multiplier: 4,
+
+        baseMultiplier: 4,
+        differenceMultiplier: 4,
+
         order: 3,
       ),
       ContractRule(
         id: 'garde_sans',
         name: 'Garde Sans',
+
         multiplier: 6,
+
+        baseMultiplier: 6,
+        differenceMultiplier: 6,
+
         order: 4,
       ),
       ContractRule(
         id: 'garde_contre',
         name: 'Garde Contre',
+
         multiplier: 8,
+
+        baseMultiplier: 8,
+        differenceMultiplier: 8,
+
         order: 5,
       ),
     ],

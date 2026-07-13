@@ -29,8 +29,17 @@ class ContractRule {
   // Règle de calcul
   //---------------------------------------------------------------------------
 
-  /// Multiplicateur appliqué au score de base.
+  /// Ancien multiplicateur.
+  ///
+  /// Conservé temporairement afin d'assurer la compatibilité pendant
+  /// la migration vers le nouveau moteur de calcul.
   final int multiplier;
+
+  /// Multiplicateur appliqué aux points de base.
+  final int baseMultiplier;
+
+  /// Multiplicateur appliqué à l'écart.
+  final int differenceMultiplier;
 
   //---------------------------------------------------------------------------
   // Configuration
@@ -50,9 +59,14 @@ class ContractRule {
     required this.id,
     required this.name,
     required this.multiplier,
+    int? baseMultiplier,
+    int? differenceMultiplier,
     required this.order,
     this.enabled = true,
-  });
+  })  : baseMultiplier =
+            baseMultiplier ?? multiplier,
+        differenceMultiplier =
+            differenceMultiplier ?? multiplier;
 
   //---------------------------------------------------------------------------
   // Copy
@@ -62,14 +76,28 @@ class ContractRule {
     String? id,
     String? name,
     int? multiplier,
+    int? baseMultiplier,
+    int? differenceMultiplier,
     int? order,
     bool? enabled,
   }) {
     return ContractRule(
       id: id ?? this.id,
       name: name ?? this.name,
-      multiplier: multiplier ?? this.multiplier,
+
+      multiplier:
+          multiplier ?? this.multiplier,
+
+      baseMultiplier:
+          baseMultiplier ??
+              this.baseMultiplier,
+
+      differenceMultiplier:
+          differenceMultiplier ??
+              this.differenceMultiplier,
+
       order: order ?? this.order,
+
       enabled: enabled ?? this.enabled,
     );
   }
@@ -77,16 +105,30 @@ class ContractRule {
   //---------------------------------------------------------------------------
   // Mapping
   //---------------------------------------------------------------------------
-
-  factory ContractRule.fromMap(
+    factory ContractRule.fromMap(
     Map<String, dynamic> map,
   ) {
+    final multiplier =
+        map['multiplier'] as int;
+
     return ContractRule(
       id: map['id'] as String,
       name: map['name'] as String,
-      multiplier: map['multiplier'] as int,
+
+      multiplier: multiplier,
+
+      baseMultiplier:
+          map['baseMultiplier'] as int? ??
+              multiplier,
+
+      differenceMultiplier:
+          map['differenceMultiplier'] as int? ??
+              multiplier,
+
       order: map['order'] as int,
-      enabled: (map['enabled'] as int?) != 0,
+
+      enabled:
+          (map['enabled'] as int?) != 0,
     );
   }
 
@@ -94,8 +136,19 @@ class ContractRule {
     return {
       'id': id,
       'name': name,
+
+      // Ancien format conservé
+      // pendant la migration.
       'multiplier': multiplier,
+
+      // Nouveau format.
+      'baseMultiplier':
+          baseMultiplier,
+      'differenceMultiplier':
+          differenceMultiplier,
+
       'order': order,
+
       'enabled': enabled ? 1 : 0,
     };
   }
@@ -110,6 +163,8 @@ class ContractRule {
         'id: $id, '
         'name: $name, '
         'multiplier: ×$multiplier, '
+        'baseMultiplier: ×$baseMultiplier, '
+        'differenceMultiplier: ×$differenceMultiplier, '
         'order: $order, '
         'enabled: $enabled'
         ')';
@@ -124,7 +179,12 @@ class ContractRule {
     return other is ContractRule &&
         other.id == id &&
         other.name == name &&
-        other.multiplier == multiplier &&
+        other.multiplier ==
+            multiplier &&
+        other.baseMultiplier ==
+            baseMultiplier &&
+        other.differenceMultiplier ==
+            differenceMultiplier &&
         other.order == order &&
         other.enabled == enabled;
   }
@@ -135,6 +195,8 @@ class ContractRule {
       id,
       name,
       multiplier,
+      baseMultiplier,
+      differenceMultiplier,
       order,
       enabled,
     );

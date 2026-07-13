@@ -43,62 +43,49 @@ class ProfileContractsCard extends StatelessWidget {
     final contracts = List<ContractRule>.from(
       profile.contracts,
     )..sort(
-        (a, b) =>
-            a.order.compareTo(b.order),
+        (a, b) => a.order.compareTo(b.order),
       );
 
     return AppCard(
       child: Column(
-        children: List.generate(
-          contracts.length,
-          (index) {
-            final contract =
-                contracts[index];
-
-            return Column(
-              children: [
-                if (index > 0)
-                  const Divider(height: 1),
-
-                CheckboxListTile(
-                  value: contract.enabled,
-
-                  title: Text(contract.name),
-
-                  controlAffinity:
-                      ListTileControlAffinity
-                          .leading,
-
-                  onChanged: (value) {
-                    final updated =
-                        contract.copyWith(
-                      enabled:
-                          value ?? false,
-                    );
-
-                    onChanged(
-                      profile.updateContract(
-                        updated,
-                      ),
-                    );
-                  },
-                ),
-
-                Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    left: AppSpacing.xl,
-                    right: AppSpacing.lg,
-                    bottom: AppSpacing.md,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(
+              AppSpacing.lg,
+            ),
+            child: RuleValueField(
+              label: 'Points de base',
+              value: profile.basePoints,
+              onChanged: (value) {
+                onChanged(
+                  profile.copyWith(
+                    basePoints: value,
                   ),
-                  child: RuleValueField(
-                    label: 'Multiplicateur',
-                    value:
-                        contract.multiplier,
+                );
+              },
+            ),
+          ),
+
+          const Divider(height: 1),
+
+          ...List.generate(
+            contracts.length,
+            (index) {
+              final contract = contracts[index];
+
+              return Column(
+                children: [
+                  CheckboxListTile(
+                    value: contract.enabled,
+                    title: Text(contract.name),
+                    controlAffinity:
+                        ListTileControlAffinity
+                            .leading,
                     onChanged: (value) {
                       final updated =
                           contract.copyWith(
-                        multiplier: value,
+                        enabled:
+                            value ?? false,
                       );
 
                       onChanged(
@@ -108,11 +95,41 @@ class ProfileContractsCard extends StatelessWidget {
                       );
                     },
                   ),
-                ),
-              ],
-            );
-          },
-        ),
+
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(
+                      left: AppSpacing.xl,
+                      right: AppSpacing.lg,
+                      bottom: AppSpacing.md,
+                    ),
+                    child: RuleValueField(
+                      label: 'Multiplicateur',
+                      value:
+                          contract.multiplier,
+                      onChanged: (value) {
+                        final updated =
+                            contract.copyWith(
+                          multiplier: value,
+                        );
+
+                        onChanged(
+                          profile.updateContract(
+                            updated,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  if (index <
+                      contracts.length - 1)
+                    const Divider(height: 1),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }

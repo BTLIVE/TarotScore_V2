@@ -39,6 +39,8 @@ class RuleProfileFactory {
 
       version: version,
 
+      basePoints: 25,
+
       contracts:
           catalog.contracts
               .map(

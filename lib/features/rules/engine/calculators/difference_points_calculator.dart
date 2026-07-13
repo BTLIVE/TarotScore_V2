@@ -2,9 +2,9 @@
 //
 // TarotScore V2
 //
-// Fichier : contract_multiplier_calculator.dart
+// Fichier : difference_points_calculator.dart
 //
-// Description : Application du multiplicateur de contrat.
+// Description : Calcul des points provenant de l'écart.
 //
 // Auteur : David
 //
@@ -14,9 +14,9 @@ import '../exceptions/invalid_deal_exception.dart';
 import '../pipeline/deal_calculation.dart';
 import 'calculator.dart';
 
-class ContractMultiplierCalculator
+class DifferencePointsCalculator
     implements Calculator {
-  const ContractMultiplierCalculator();
+  const DifferencePointsCalculator();
 
   //--------------------------------------------------------------------------
   // Calcul
@@ -26,13 +26,12 @@ class ContractMultiplierCalculator
   DealCalculation calculate(
     DealCalculation calculation,
   ) {
-    final baseScore = calculation.baseScore;
-    final success = calculation.success;
+    final difference =
+        calculation.difference;
 
-    if (baseScore == null ||
-        success == null) {
+    if (difference == null) {
       throw InvalidDealException(
-        'Le score de base doit être calculé avant le multiplicateur.',
+        'L\'écart doit être calculé avant les points d\'écart.',
       );
     }
 
@@ -43,25 +42,20 @@ class ContractMultiplierCalculator
 
     if (contract == null) {
       throw InvalidDealException(
-        'Contrat inconnu : ${calculation.deal.contractId}',
+        'Contrat inconnu : '
+        '${calculation.deal.contractId}',
       );
     }
 
-    final multiplier =
-        contract.multiplier;
-
-    final contractScore =
-        baseScore * multiplier;
-
-    final signedScore = success
-        ? contractScore
-        : -contractScore;
+    final differencePoints =
+        (difference *
+                contract
+                    .differenceMultiplier)
+            .round();
 
     return calculation.copyWith(
-      contractMultiplier:
-          multiplier,
-      contractScore: signedScore,
-      finalScore: signedScore,
+      differencePoints:
+          differencePoints,
     );
   }
 }

@@ -70,7 +70,8 @@ class DealResultDialog extends StatelessWidget {
 
                     _line(
                       'Objectif',
-                      calculation.target?.toString() ??
+                      calculation.target
+                              ?.toString() ??
                           '-',
                     ),
 
@@ -91,26 +92,36 @@ class DealResultDialog extends StatelessWidget {
                     const Divider(),
 
                     _line(
-                      'Score de base',
-                      calculation.baseScore
+                      'Points contrat',
+                      calculation
+                              .contractPoints
                               ?.toString() ??
                           '-',
                     ),
 
                     _line(
-                      'Multiplicateur',
-                      calculation.contractMultiplier ==
-                              null
-                          ? '-'
-                          : '×${calculation.contractMultiplier}',
-                    ),
-
-                    _line(
-                      'Score contrat',
-                      calculation.contractScore
+                      'Points écart',
+                      calculation
+                              .differencePoints
                               ?.toString() ??
                           '-',
                     ),
+
+                    if (calculation.bonusPoints !=
+                        0)
+                      _line(
+                        'Bonus',
+                        '+${calculation.bonusPoints}',
+                      ),
+
+                    if (calculation.penaltyPoints !=
+                        0)
+                      _line(
+                        'Pénalités',
+                        '-${calculation.penaltyPoints}',
+                      ),
+
+                    const Divider(),
 
                     _line(
                       'Score final',
@@ -190,7 +201,7 @@ class DealResultDialog extends StatelessWidget {
       ),
 
       actions: [
-        TextButton(
+                TextButton(
           onPressed: () {
             Navigator.pop(
               context,
@@ -246,9 +257,10 @@ class DealResultDialog extends StatelessWidget {
   List<Widget> _buildBonuses() {
     return calculation.appliedBonuses.map(
       (bonus) {
-        final label = bonus.hasDescription
-            ? '${bonus.name} (${bonus.description})'
-            : bonus.name;
+        final label =
+            bonus.hasDescription
+                ? '${bonus.name} (${bonus.description})'
+                : bonus.name;
 
         return Padding(
           padding:

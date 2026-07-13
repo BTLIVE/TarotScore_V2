@@ -37,22 +37,44 @@ class DealCalculation {
   /// Nombre de points nécessaires pour réussir.
   final double? target;
 
-  /// Ecart entre les points réalisés et l'objectif.
+  //--------------------------------------------------------------------------
+  // Différence
+  //--------------------------------------------------------------------------
+
+  /// Ecart brut entre les points réalisés et l'objectif.
   ///
   /// Positif si le contrat est réussi.
+  final double? rawDifference;
+
+  /// Ecart retenu après application des règles du profil.
   final double? difference;
 
-  /// Score de base (25 + écart).
-  final int? baseScore;
+  //--------------------------------------------------------------------------
+  // Composantes du score
+  //--------------------------------------------------------------------------
 
-  /// Multiplicateur du contrat.
-  final int? contractMultiplier;
+  /// Points provenant du contrat.
+  final int? contractPoints;
 
-  /// Score après application du multiplicateur.
-  final int? contractScore;
+  /// Points provenant de l'écart.
+  final int? differencePoints;
+
+  /// Total des bonus.
+  final int bonusPoints;
+
+  /// Total des pénalités.
+  final int penaltyPoints;
+
+  //--------------------------------------------------------------------------
+  // Bonus
+  //--------------------------------------------------------------------------
 
   /// Bonus effectivement appliqués.
   final List<AppliedBonus> appliedBonuses;
+
+  //--------------------------------------------------------------------------
+  // Résultat
+  //--------------------------------------------------------------------------
 
   /// Score final de la donne.
   final int? finalScore;
@@ -71,13 +93,21 @@ class DealCalculation {
     required this.profile,
     required this.context,
     required this.deal,
+
     this.success,
     this.target,
+
+    this.rawDifference,
     this.difference,
-    this.baseScore,
-    this.contractMultiplier,
-    this.contractScore,
+
+    this.contractPoints,
+    this.differencePoints,
+
+    this.bonusPoints = 0,
+    this.penaltyPoints = 0,
+
     this.appliedBonuses = const [],
+
     this.finalScore,
     this.playerScores,
   });
@@ -85,18 +115,25 @@ class DealCalculation {
   //--------------------------------------------------------------------------
   // Copy
   //--------------------------------------------------------------------------
-
-  DealCalculation copyWith({
+    DealCalculation copyWith({
     RuleProfile? profile,
     DealContext? context,
     Deal? deal,
+
     bool? success,
     double? target,
+
+    double? rawDifference,
     double? difference,
-    int? baseScore,
-    int? contractMultiplier,
-    int? contractScore,
+
+    int? contractPoints,
+    int? differencePoints,
+
+    int? bonusPoints,
+    int? penaltyPoints,
+
     List<AppliedBonus>? appliedBonuses,
+
     int? finalScore,
     Map<int, int>? playerScores,
   }) {
@@ -104,22 +141,36 @@ class DealCalculation {
       profile: profile ?? this.profile,
       context: context ?? this.context,
       deal: deal ?? this.deal,
+
       success: success ?? this.success,
       target: target ?? this.target,
+
+      rawDifference:
+          rawDifference ?? this.rawDifference,
+
       difference:
           difference ?? this.difference,
-      baseScore: baseScore ?? this.baseScore,
-      contractMultiplier:
-          contractMultiplier ??
-              this.contractMultiplier,
-      contractScore:
-          contractScore ??
-              this.contractScore,
+
+      contractPoints:
+          contractPoints ?? this.contractPoints,
+
+      differencePoints:
+          differencePoints ??
+              this.differencePoints,
+
+      bonusPoints:
+          bonusPoints ?? this.bonusPoints,
+
+      penaltyPoints:
+          penaltyPoints ?? this.penaltyPoints,
+
       appliedBonuses:
           appliedBonuses ??
               this.appliedBonuses,
+
       finalScore:
           finalScore ?? this.finalScore,
+
       playerScores:
           playerScores ?? this.playerScores,
     );
@@ -145,10 +196,10 @@ class DealCalculation {
   bool get isComplete =>
       success != null &&
       target != null &&
+      rawDifference != null &&
       difference != null &&
-      baseScore != null &&
-      contractMultiplier != null &&
-      contractScore != null &&
+      contractPoints != null &&
+      differencePoints != null &&
       finalScore != null &&
       playerScores != null;
 }

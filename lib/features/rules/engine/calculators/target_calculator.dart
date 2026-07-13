@@ -1,19 +1,22 @@
 // ***************************************************************************
+//
 // TarotScore V2
 //
-// Fichier : base_score_calculator.dart
+// Fichier : target_calculator.dart
 //
-// Description : Calcul du score de base d'une manche.
+// Description : Détermination du score cible.
 //
 // Auteur : David
+//
 // ***************************************************************************
 
 import '../exceptions/invalid_deal_exception.dart';
 import '../pipeline/deal_calculation.dart';
 import 'calculator.dart';
 
-class BaseScoreCalculator implements Calculator {
-  const BaseScoreCalculator();
+class TargetCalculator
+    implements Calculator {
+  const TargetCalculator();
 
   //--------------------------------------------------------------------------
   // Calcul
@@ -23,7 +26,8 @@ class BaseScoreCalculator implements Calculator {
   DealCalculation calculate(
     DealCalculation calculation,
   ) {
-    final target = calculation.profile.targetScore(
+    final target =
+        calculation.profile.targetScore(
       calculation.deal.oudlers,
     );
 
@@ -33,22 +37,8 @@ class BaseScoreCalculator implements Calculator {
       );
     }
 
-    final difference =
-        calculation.deal.points - target;
-
-    final success = difference >= 0;
-
-    final baseScore =
-        25 + difference.abs().round();
-
     return calculation.copyWith(
-      success: success,
-
       target: target.toDouble(),
-
-      difference: difference,
-
-      baseScore: baseScore,
     );
   }
 }

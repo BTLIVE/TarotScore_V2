@@ -25,13 +25,6 @@ class BonusCalculator implements Calculator {
   DealCalculation calculate(
     DealCalculation calculation,
   ) {
-    final contractScore =
-        calculation.contractScore;
-
-    if (contractScore == null) {
-      return calculation;
-    }
-
     final appliedBonuses =
         <AppliedBonus>[];
 
@@ -70,8 +63,7 @@ class BonusCalculator implements Calculator {
 
     return calculation.copyWith(
       appliedBonuses: appliedBonuses,
-      finalScore:
-          contractScore + totalBonus,
+      bonusPoints: totalBonus,
     );
   }
 }

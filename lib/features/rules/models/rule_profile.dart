@@ -1,4 +1,5 @@
 // ***************************************************************************
+//
 // TarotScore V2
 //
 // Fichier : rule_profile.dart
@@ -10,6 +11,7 @@
 
 import 'bonus_rule.dart';
 import 'contract_rule.dart';
+import 'difference_calculation_mode.dart';
 import 'penalty_rule.dart';
 
 class RuleProfile {
@@ -33,6 +35,16 @@ class RuleProfile {
   // Règles
   //---------------------------------------------------------------------------
 
+  /// Points de base des contrats.
+  ///
+  /// FFT : 25
+  /// Certaines variantes utilisent 20 ou 30.
+  final int basePoints;
+
+  /// Mode de calcul de l'écart.
+  final DifferenceCalculationMode
+      differenceCalculationMode;
+
   /// Contrats disponibles.
   final List<ContractRule> contracts;
 
@@ -43,9 +55,6 @@ class RuleProfile {
   final List<PenaltyRule> penalties;
 
   /// Nombre de points à réaliser selon le nombre de bouts.
-  ///
-  /// Clé : 0, 1, 2 ou 3 bouts.
-  /// Valeur : score minimum à atteindre.
   final Map<int, int> targetScores;
 
   //---------------------------------------------------------------------------
@@ -57,6 +66,12 @@ class RuleProfile {
     required this.name,
     required this.description,
     required this.version,
+
+    this.basePoints = 25,
+
+    this.differenceCalculationMode =
+        DifferenceCalculationMode.exact,
+
     this.contracts = const [],
     this.bonuses = const [],
     this.penalties = const [],
@@ -67,10 +82,8 @@ class RuleProfile {
   // Getters
   //---------------------------------------------------------------------------
 
-  /// Nom affiché dans l'interface.
   String get displayName => name;
 
-  /// Contrats actifs triés par ordre.
   List<ContractRule> get enabledContracts {
     final list =
         contracts.where((c) => c.enabled).toList();
@@ -82,7 +95,6 @@ class RuleProfile {
     return list;
   }
 
-  /// Bonus actifs triés par ordre.
   List<BonusRule> get enabledBonuses {
     final list =
         bonuses.where((b) => b.enabled).toList();
@@ -94,7 +106,6 @@ class RuleProfile {
     return list;
   }
 
-  /// Pénalités actives triées par ordre.
   List<PenaltyRule> get enabledPenalties {
     final list =
         penalties.where((p) => p.enabled).toList();
@@ -106,28 +117,21 @@ class RuleProfile {
     return list;
   }
 
-  /// Nombre total de contrats.
   int get contractCount => contracts.length;
 
-  /// Nombre de contrats actifs.
   int get enabledContractCount =>
       enabledContracts.length;
 
-  /// Nombre total de bonus.
   int get bonusCount => bonuses.length;
 
-  /// Nombre de bonus actifs.
   int get enabledBonusCount =>
       enabledBonuses.length;
 
-  /// Nombre total de pénalités.
   int get penaltyCount => penalties.length;
 
-  /// Nombre de pénalités actives.
   int get enabledPenaltyCount =>
       enabledPenalties.length;
 
-  /// Résumé du profil.
   String get summary =>
       '$enabledContractCount contrat'
       '${enabledContractCount > 1 ? 's' : ''}'
@@ -168,9 +172,8 @@ class RuleProfile {
     return null;
   }
 
-  int? targetScore(int oudlers) {
-    return targetScores[oudlers];
-  }
+  int? targetScore(int oudlers) =>
+      targetScores[oudlers];
 
   //---------------------------------------------------------------------------
   // Mise à jour
@@ -178,56 +181,44 @@ class RuleProfile {
 
   RuleProfile updateContract(
     ContractRule contract,
-  ) {
-    final updatedContracts =
-        contracts
+  ) =>
+      copyWith(
+        contracts: contracts
             .map(
               (item) => item.id == contract.id
                   ? contract
                   : item,
             )
-            .toList();
-
-    return copyWith(
-      contracts: updatedContracts,
-    );
-  }
+            .toList(),
+      );
 
   RuleProfile updateBonus(
     BonusRule bonus,
-  ) {
-    final updatedBonuses =
-        bonuses
+  ) =>
+      copyWith(
+        bonuses: bonuses
             .map(
               (item) =>
                   item.id == bonus.id
                       ? bonus
                       : item,
             )
-            .toList();
-
-    return copyWith(
-      bonuses: updatedBonuses,
-    );
-  }
+            .toList(),
+      );
 
   RuleProfile updatePenalty(
     PenaltyRule penalty,
-  ) {
-    final updatedPenalties =
-        penalties
+  ) =>
+      copyWith(
+        penalties: penalties
             .map(
               (item) =>
                   item.id == penalty.id
                       ? penalty
                       : item,
             )
-            .toList();
-
-    return copyWith(
-      penalties: updatedPenalties,
-    );
-  }
+            .toList(),
+      );
 
   //---------------------------------------------------------------------------
   // Copy
@@ -238,6 +229,12 @@ class RuleProfile {
     String? name,
     String? description,
     String? version,
+
+    int? basePoints,
+
+    DifferenceCalculationMode?
+        differenceCalculationMode,
+
     List<ContractRule>? contracts,
     List<BonusRule>? bonuses,
     List<PenaltyRule>? penalties,
@@ -249,6 +246,14 @@ class RuleProfile {
       description:
           description ?? this.description,
       version: version ?? this.version,
+
+      basePoints:
+          basePoints ?? this.basePoints,
+
+      differenceCalculationMode:
+          differenceCalculationMode ??
+              this.differenceCalculationMode,
+
       contracts: contracts ?? this.contracts,
       bonuses: bonuses ?? this.bonuses,
       penalties: penalties ?? this.penalties,
@@ -266,6 +271,9 @@ class RuleProfile {
     return 'RuleProfile('
         'name: $name, '
         'version: $version, '
+        'basePoints: $basePoints, '
+        'differenceCalculationMode: '
+        '$differenceCalculationMode, '
         'contracts: ${contracts.length}, '
         'bonuses: ${bonuses.length}, '
         'penalties: ${penalties.length}'
@@ -278,8 +286,13 @@ class RuleProfile {
         other is RuleProfile &&
             other.uuid == uuid &&
             other.name == name &&
-            other.description == description &&
-            other.version == version;
+            other.description ==
+                description &&
+            other.version == version &&
+            other.basePoints ==
+                basePoints &&
+            other.differenceCalculationMode ==
+                differenceCalculationMode;
   }
 
   @override
@@ -288,5 +301,7 @@ class RuleProfile {
         name,
         description,
         version,
+        basePoints,
+        differenceCalculationMode,
       );
 }
